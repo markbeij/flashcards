@@ -1,0 +1,3 @@
+#include "Generated.xcconfig"
+// Local signing team, not committed (see Signing.xcconfig.example).
+#include? "Signing.xcconfig"

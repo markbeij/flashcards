@@ -1,6 +1,11 @@
 # Flashcards app: project brief (handoff to Claude Code)
 
-Put this file in the repo as `docs/SPEC.md`. The "CLAUDE.md starter" at the bottom goes in `CLAUDE.md` in the repo root.
+> **v1 scope is set in [PLAN.md](PLAN.md), which wins where it conflicts with this brief.** Superseded here:
+> - §3 fixed Course → Year → Chapter → Paragraph levels: v1 uses a generic folder tree of any depth.
+> - §4 configurable presets, per-printer calibration, print queue and print history: v1 has fixed S/M/L, one calibration, no queue/history.
+> - §5 drift (SQLite): v1 stores JSON files. CSV/paste import is deferred.
+> - §6 export bundle with `VACUUM INTO`: v1 relies on iCloud device backup only; the bundle is deferred and will zip the JSON files.
+> - §1/§9: iPad + iPhone only; family use via the App Store; leerjaar answered; UI in NL/EN/FR/DE.
 
 Status: design discussion finished, no code written yet. Findings below were checked against package docs and the `pdf` package source. **No Flutter code was executed** (the sandbox had no SDK and could not reach pub.dev), so anything marked UNVERIFIED must be proven by a spike before building on it.
 

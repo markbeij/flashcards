@@ -1,0 +1,9 @@
+{
+  "@@locale": "de",
+  "appTitle": "Karteikarten",
+  "libraryEmpty": "Lege einen Ordner pro Fach an, zum Beispiel Latein.",
+  "newFolder": "Neuer Ordner",
+  "printTest": "Drucktest",
+  "testSheetFrontTitle": "Testblatt · Vorderseite · beidseitig, an langer Kante wenden, Skalierung 100 %",
+  "testSheetBackTitle": "Testblatt · Rückseite"
+}

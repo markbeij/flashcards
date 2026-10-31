@@ -1,0 +1,27 @@
+{
+  "@@locale": "nl",
+  "appTitle": "Flitskaarten",
+  "@appTitle": {
+    "description": "App name shown in the navigation bar."
+  },
+  "libraryEmpty": "Maak een map per vak, bijvoorbeeld Latijn.",
+  "@libraryEmpty": {
+    "description": "Empty state of the library."
+  },
+  "newFolder": "Nieuwe map",
+  "@newFolder": {
+    "description": "Button that creates a folder."
+  },
+  "printTest": "Printtest",
+  "@printTest": {
+    "description": "Temporary button and screen title for Spike 0 (print fidelity test)."
+  },
+  "testSheetFrontTitle": "Testvel · voorkant · dubbelzijdig, omslaan langs de lange kant, schaal 100%",
+  "@testSheetFrontTitle": {
+    "description": "Printed at the top of the test sheet's front page."
+  },
+  "testSheetBackTitle": "Testvel · achterkant",
+  "@testSheetBackTitle": {
+    "description": "Printed at the top of the test sheet's back page."
+  }
+}
