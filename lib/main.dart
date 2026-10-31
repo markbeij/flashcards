@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'data/store/library_notifier.dart';
 import 'ui/app.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LicenseRegistry.addLicense(_gentiumLicense);
-  runApp(const ProviderScope(child: FlashcardsApp()));
+  final (container, _) = await openLibrary();
+  runApp(UncontrolledProviderScope(container: container, child: const FlashcardsApp()));
 }
 
 Stream<LicenseEntry> _gentiumLicense() async* {
