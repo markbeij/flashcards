@@ -53,17 +53,27 @@ class RowEngineKeys extends StatelessWidget {
       },
       child: Actions(
         actions: {
+          // Fields outside the row engine (paradigm lines) use the normal
+          // traversal.
           NextFieldIntent: CallbackAction<NextFieldIntent>(
             onInvoke: (_) {
               final focused = _focused();
-              if (focused != null) session.next(focused.$1, focused.$2);
+              if (focused != null) {
+                session.next(focused.$1, focused.$2);
+              } else {
+                FocusManager.instance.primaryFocus?.nextFocus();
+              }
               return null;
             },
           ),
           PreviousFieldIntent: CallbackAction<PreviousFieldIntent>(
             onInvoke: (_) {
               final focused = _focused();
-              if (focused != null) session.previous(focused.$1, focused.$2);
+              if (focused != null) {
+                session.previous(focused.$1, focused.$2);
+              } else {
+                FocusManager.instance.primaryFocus?.previousFocus();
+              }
               return null;
             },
           ),

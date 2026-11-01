@@ -48,6 +48,7 @@ class _CardEditorScreenState extends ConsumerState<CardEditorScreen>
       type: card.type,
       language: session.language,
       first: DraftCard.of(card.content, cardId: card.uuid, seq: card.seq),
+      editing: true,
     );
     // The card opens again at the next start.
     Future.microtask(() {

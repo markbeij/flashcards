@@ -39,6 +39,10 @@ class EntrySession extends ChangeNotifier {
   /// Cards added in this session.
   int added = 0;
 
+  /// Editing one existing card: finishing it saves it but starts no new
+  /// card.
+  bool editing = false;
+
   /// Called with the card number after a new card is saved, e.g. to
   /// announce it.
   void Function(int seq)? onAdded;
@@ -51,7 +55,9 @@ class EntrySession extends ChangeNotifier {
     required CardType type,
     required VocabLanguage language,
     DraftCard? first,
+    bool editing = false,
   }) {
+    this.editing = editing;
     this.type = first?.type ?? type;
     this.language = first?.language ?? language;
     _add(first ?? DraftCard(type: this.type, language: this.language));
@@ -177,6 +183,7 @@ class EntrySession extends ChangeNotifier {
       if (missing != null) row.focus(missing).requestFocus();
       return;
     }
+    if (editing) return;
     if (!identical(row, active)) {
       final next = rows[rows.indexOf(row) + 1];
       next.focus(gridOrder(next).first).requestFocus();

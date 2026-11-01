@@ -42,6 +42,22 @@ Record decisions and spike results here, newest last. Each entry: date, decision
   - `docs/SPEC.md` (the original brief) is removed; `docs/PLAN.md` is the only spec and holds only v1.
 - **Why:** get a working first version sooner.
 
+## 2026-11-01: Card layout, entry engine and print details (Milestones 3–4)
+
+Choices made while building where the plan left room. Revisit any of them after the first printed sheet or the first session on the iPad.
+
+- **What each side shows** (`lib/render/templates/`). Front → back:
+  - vocabulary: Dutch word (+ "mv." plural) → target word with article, then Latin "genitive gender." (as on the test sheet: *puellae f.*), German plural with "die", French gender only when the article doesn't show it (*l'élève m.*), "pl." for the others;
+  - begrip: term → explanation; paradigm: heading → label/value table; sentence: Dutch → translation + grammar point; history: **event → date + context** (learning the year of an event).
+  - The print-time ⇄ swaps every card. The direction line names the vocabulary languages in the selection ("Front shows: Dutch / Latin"), or "question / answer" when there are none.
+- **Card frame:** 5 mm padding at the sides and top (room for a cut that is ~1 mm off), footer 7 pt grey at the bottom of both sides. Headline 17 pt bold, sentences 13 pt, body 11 pt. Content is top-aligned. The paradigm label column is a fixed 24 mm so the word-width check knows each column's width.
+- **Calibration semantics:** the value read off the test sheet (where the front cross lands on the back scale, x right / y down) is the offset applied to the back page, cut ticks included. The test sheet itself is printed uncalibrated, so a reading is always absolute.
+- **Row engine:** Return/Tab on a row's last field saves the row; the active (bottom) row hands its saved card to a new row inserted above it and is emptied, so focus never has to move to a field that isn't built yet. A row that loses focus is saved if complete; an incomplete row stays a draft with an orange dot, and Done asks before discarding it. Switching type or language puts saved and blank rows away and keeps incomplete ones.
+- **Editor:** the same form as "Add cards"; it saves on focus loss and on Done and never starts a new card. A vocabulary card's language can be changed there.
+- **Sessions:** drafts (controllers and focus nodes) live in a Riverpod `entrySessionProvider` keyed by screen, above the grid/rapid-card switch, and are disposed when the screen closes.
+- **Golden tests** (rasterising sheets with `Printing.raster`) are not in the suite yet: rasterising needs the native plugin, which `flutter test` on Linux doesn't have. The sheet and card PDFs were checked visually with `pdftoppm` (set `FLASHCARDS_SHEET_OUT` when running `test/render/sheet_test.dart`). Add goldens on macOS.
+- **Still to verify on the iPad** (plan, Verification): keyboard-only entry of 50 words with hardware and software keyboard, no keyboard flicker or QuickType jump, Split View resize while typing, VoiceOver on the grid, German UI, preview timing on the oldest iPad, and a printed + cut sheet.
+
 ## Spike results
 
 - **Spike 0 (print fidelity), 2026-10-31, done.** Canon MG5700, plain copy paper (Action A4, weight not stated; likely 80 g/m²). Printed from the iPad through AirPrint (`Printing.layoutPdf`), double-sided, uncalibrated.

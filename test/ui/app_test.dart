@@ -206,6 +206,74 @@ void main() {
     });
   });
 
+  testWidgets('a type tile opens the form; Cmd-Return saves and clears it', (
+    tester,
+  ) async {
+    final container = await pumpApp(tester, library: _library());
+    await tester.tap(find.text('Begrip'));
+    await tester.pumpAndSettle();
+    final term = field('Nieuwe kaart, Begrip');
+    expect(hasFocus(tester, term), isTrue);
+    await tester.enterText(term, 'Fotosynthese');
+    await tester.enterText(
+      field('Nieuwe kaart, Uitleg'),
+      'Licht wordt glucose.',
+    );
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
+    await tester.pump();
+
+    final card = container.read(libraryProvider).cardsIn('d1').values.single;
+    expect(
+      card.content,
+      const BegripContent(
+        term: 'Fotosynthese',
+        explanation: 'Licht wordt glucose.',
+      ),
+    );
+    expect(
+      container.read(libraryProvider).decks['d1']!.lastCardType,
+      CardType.begrip,
+    );
+    expect(tester.widget<EditableText>(term).controller.text, isEmpty);
+    expect(hasFocus(tester, term), isTrue);
+    expect(find.text('1 kaart toegevoegd'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 1));
+  });
+
+  testWidgets('the editor saves a changed card and keeps it open', (
+    tester,
+  ) async {
+    final container = await pumpApp(
+      tester,
+      library: _library(
+        cards: [_card(1, const BegripContent(term: 'a', explanation: 'b'))],
+      ),
+    );
+    await tester.tap(find.text('a'));
+    await tester.pumpAndSettle();
+    final term = field('Kaart 1, Begrip');
+    await tester.enterText(term, 'Fotosynthese');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pump();
+    // Cmd-Return in the editor saves; it doesn't start a new card.
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
+    await tester.pump();
+    expect(
+      container.read(libraryProvider).cardsIn('d1')['c1']!.content,
+      const BegripContent(term: 'Fotosynthese', explanation: 'b'),
+    );
+    expect(tester.widget<EditableText>(term).controller.text, 'Fotosynthese');
+
+    await tester.tap(find.text('Klaar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Fotosynthese'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 1));
+  });
+
   group('layout switch at 680 pt', () {
     testWidgets('keeps the selection', (tester) async {
       final container = await pumpApp(

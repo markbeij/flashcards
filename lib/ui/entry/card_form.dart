@@ -22,8 +22,7 @@ class CardForm extends StatelessWidget {
   final EntrySession session;
   final DraftCard draft;
 
-  /// In "Add cards": Return on the last field saves and starts the next
-  /// card.
+  /// In "Add cards" (as opposed to editing a card).
   final bool adding;
   final Widget? footer;
 
@@ -41,10 +40,8 @@ class CardForm extends StatelessWidget {
       draft.focus(fields[i + 1]).requestFocus();
     } else if (draft.type == CardType.paradigm) {
       _focusLine(0);
-    } else if (adding) {
-      session.finishRow(draft);
     } else {
-      session.commit(draft);
+      session.finishRow(draft);
     }
   }
 
