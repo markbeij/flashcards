@@ -20,8 +20,11 @@ void main() {
   });
 
   test('a long explanation overflows', () {
-    final long = List.filled(40, 'Achttiende-eeuwse stroming die de rede '
-        'boven traditie en geloof stelde.').join(' ');
+    final long = List.filled(
+      40,
+      'Achttiende-eeuwse stroming die de rede '
+      'boven traditie en geloof stelde.',
+    ).join(' ');
     expect(
       checker.overflows(BegripContent(term: 'Verlichting', explanation: long)),
       isTrue,

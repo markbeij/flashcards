@@ -30,7 +30,10 @@ void main() {
   });
 
   test('duplex has a front and a back page per sheet', () async {
-    final cards = [...samplePrintCards(), ...samplePrintCards()].take(9).toList();
+    final cards = [
+      ...samplePrintCards(),
+      ...samplePrintCards(),
+    ].take(9).toList();
     final duplex = await buildSheets(cards, theme: theme, title: 't');
     expect(pageCount(duplex), 4);
 
@@ -62,7 +65,10 @@ void main() {
   });
 
   test('card preview has the front and the back', () async {
-    final bytes = await buildCardPreview(samplePrintCards().first, theme: theme);
+    final bytes = await buildCardPreview(
+      samplePrintCards().first,
+      theme: theme,
+    );
     expect(pageCount(bytes), 2);
   });
 }

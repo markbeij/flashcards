@@ -23,8 +23,7 @@ class OverflowChecker {
   final _document = PdfDocument();
   final _cache = <CardContent, bool>{};
 
-  bool overflows(CardContent content) =>
-      _cache[content] ??= _measure(content);
+  bool overflows(CardContent content) => _cache[content] ??= _measure(content);
 
   bool _measure(CardContent content) {
     final faces = facesOf(content);

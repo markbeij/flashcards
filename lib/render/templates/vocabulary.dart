@@ -14,8 +14,7 @@ CardFaces vocabularyFaces(VocabularyContent c) => CardFaces(
   CardFace([
     TextBlock(_withArticle(c.article, c.targetSingular), TextRole.headline),
     if (_has(_grammarLine(c))) TextBlock(_grammarLine(c), TextRole.subhead),
-    if (_has(c.targetPlural))
-      TextBlock(_pluralLine(c), TextRole.subhead),
+    if (_has(c.targetPlural)) TextBlock(_pluralLine(c), TextRole.subhead),
   ]),
 );
 

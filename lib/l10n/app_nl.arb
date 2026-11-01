@@ -2,11 +2,754 @@
   "@@locale": "nl",
   "appTitle": "Flitskaarten",
   "@appTitle": {
-    "description": "App name shown in the navigation bar."
+    "description": "App name."
   },
-  "printTest": "Printtest",
-  "@printTest": {
-    "description": "Temporary button and screen title for Spike 0 (print fidelity test)."
+  "library": "Bibliotheek",
+  "@library": {
+    "description": "Title of the Library (maps and decks)."
+  },
+  "settings": "Instellingen",
+  "@settings": {
+    "description": "Settings page title and gear button label."
+  },
+  "print": "Printen",
+  "@print": {
+    "description": "Print button and print screen title."
+  },
+  "printEllipsis": "Printen…",
+  "@printEllipsis": {
+    "description": "Print button inside a deck (opens the print set-up)."
+  },
+  "newDeck": "Nieuwe stapel",
+  "@newDeck": {
+    "description": "Button and sheet title: make a new deck."
+  },
+  "addCards": "Kaarten toevoegen",
+  "@addCards": {
+    "description": "Button: add cards to the open deck."
+  },
+  "chooseDeck": "Kies een stapel",
+  "@chooseDeck": {
+    "description": "Shown on the right while no deck is open."
+  },
+  "libraryEmpty": "Maak een stapel om kaarten in te zetten.",
+  "@libraryEmpty": {
+    "description": "Empty Library: one sentence."
+  },
+  "libraryEmptyExample": "Bijvoorbeeld map VWO 4, submap Latijn, titel Woordjes H3",
+  "@libraryEmptyExample": {
+    "description": "Empty Library: one example."
+  },
+  "deckMap": "Map",
+  "@deckMap": {
+    "description": "Deck field: the map (top-level group)."
+  },
+  "deckMapHint": "bijv. leerjaar",
+  "@deckMapHint": {
+    "description": "Placeholder of the map field."
+  },
+  "deckSubmap": "Submap",
+  "@deckSubmap": {
+    "description": "Deck field: the submap (group inside a map)."
+  },
+  "deckSubmapHint": "bijv. vak",
+  "@deckSubmapHint": {
+    "description": "Placeholder of the submap field."
+  },
+  "deckTitle": "Titel",
+  "@deckTitle": {
+    "description": "Deck field: the title, printed on every card."
+  },
+  "deckTitleHint": "bijv. Woordjes H3",
+  "@deckTitleHint": {
+    "description": "Placeholder of the title field."
+  },
+  "editDeck": "Stapel wijzigen",
+  "@editDeck": {
+    "description": "Menu item and sheet title."
+  },
+  "deleteDeck": "Stapel verwijderen",
+  "@deleteDeck": {
+    "description": "Menu item."
+  },
+  "deleteDeckTitle": "„{title}” verwijderen?",
+  "@deleteDeckTitle": {
+    "description": "Confirmation title.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteDeckMessage": "{count, plural, =0{De stapel is leeg.} =1{De stapel en zijn kaart worden verwijderd.} other{De stapel en zijn {count} kaarten worden verwijderd.}}",
+  "@deleteDeckMessage": {
+    "description": "Confirmation message.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deckActions": "Stapelacties",
+  "@deckActions": {
+    "description": "Accessibility label of the deck \"⋯\" menu."
+  },
+  "cancel": "Annuleren",
+  "@cancel": {
+    "description": "Button."
+  },
+  "save": "Bewaar",
+  "@save": {
+    "description": "Button."
+  },
+  "delete": "Verwijder",
+  "@delete": {
+    "description": "Button and menu item."
+  },
+  "done": "Klaar",
+  "@done": {
+    "description": "Button: close the screen."
+  },
+  "edit": "Wijzig",
+  "@edit": {
+    "description": "Menu item."
+  },
+  "select": "Selecteer",
+  "@select": {
+    "description": "Button: start select mode."
+  },
+  "undo": "Herstel",
+  "@undo": {
+    "description": "Button in the toast after deleting."
+  },
+  "moveTo": "Verplaats naar…",
+  "@moveTo": {
+    "description": "Menu item, toolbar button and sheet title."
+  },
+  "newCardLikeThis": "Nieuwe kaart zoals deze",
+  "@newCardLikeThis": {
+    "description": "Card menu item: a new card copying this one's type (and paradigm labels)."
+  },
+  "moreActions": "Meer acties",
+  "@moreActions": {
+    "description": "Accessibility label of a \"⋯\" button."
+  },
+  "deckCount": "{count, plural, =1{1 stapel} other{{count} stapels}}",
+  "@deckCount": {
+    "description": "Number of decks.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardCount": "{count, plural, =1{1 kaart} other{{count} kaarten}}",
+  "@cardCount": {
+    "description": "Number of cards.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sheetCount": "{count, plural, =1{1 vel} other{{count} vellen}}",
+  "@sheetCount": {
+    "description": "Number of A4 sheets.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardsAdded": "{count, plural, =0{Nog geen kaarten toegevoegd} =1{1 kaart toegevoegd} other{{count} kaarten toegevoegd}}",
+  "@cardsAdded": {
+    "description": "Counter in the entry screens.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardsDeleted": "{count, plural, =1{Kaart verwijderd} other{{count} kaarten verwijderd}}",
+  "@cardsDeleted": {
+    "description": "Toast after deleting cards.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardSaved": "Kaart {seq} bewaard",
+  "@cardSaved": {
+    "description": "VoiceOver announcement when a card is saved.",
+    "placeholders": {
+      "seq": {
+        "type": "int"
+      }
+    }
+  },
+  "cardSemantics": "Kaart {seq}: {front}, {back}",
+  "@cardSemantics": {
+    "description": "VoiceOver label of a card row.",
+    "placeholders": {
+      "seq": {
+        "type": "int"
+      },
+      "front": {
+        "type": "String"
+      },
+      "back": {
+        "type": "String"
+      }
+    }
+  },
+  "cardField": "Kaart {seq}, {field}",
+  "@cardField": {
+    "description": "VoiceOver label of an entry field of a saved card, e.g. \"Card 12, Latin word\".",
+    "placeholders": {
+      "seq": {
+        "type": "int"
+      },
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "newCardField": "Nieuwe kaart, {field}",
+  "@newCardField": {
+    "description": "VoiceOver label of an entry field of a new card.",
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "deckEmpty": "Deze stapel is nog leeg.",
+  "@deckEmpty": {
+    "description": "Empty deck: one sentence."
+  },
+  "deckEmptyExample": "Kies wat voor kaarten je maakt; een stapel mag soorten mengen.",
+  "@deckEmptyExample": {
+    "description": "Empty deck: hint above the card type tiles."
+  },
+  "typeVocabulary": "Woordjes",
+  "@typeVocabulary": {
+    "description": "Card type."
+  },
+  "typeBegrip": "Begrip",
+  "@typeBegrip": {
+    "description": "Card type: a term and its explanation."
+  },
+  "typeParadigm": "Rijtje",
+  "@typeParadigm": {
+    "description": "Card type: a verb or noun with its forms."
+  },
+  "typeSentence": "Zin",
+  "@typeSentence": {
+    "description": "Card type."
+  },
+  "typeHistory": "Geschiedenis",
+  "@typeHistory": {
+    "description": "Card type: a date and an event."
+  },
+  "typeVocabularyExample": "meisje → puella",
+  "@typeVocabularyExample": {
+    "description": "Example on the empty deck tile."
+  },
+  "typeBegripExample": "Fotosynthese → uitleg",
+  "@typeBegripExample": {
+    "description": "Example on the empty deck tile."
+  },
+  "typeParadigmExample": "amare → amo, amavi, amatum",
+  "@typeParadigmExample": {
+    "description": "Example on the empty deck tile."
+  },
+  "typeSentenceExample": "Ik loop. → Ambulo.",
+  "@typeSentenceExample": {
+    "description": "Example on the empty deck tile."
+  },
+  "typeHistoryExample": "Vrede van Münster → 1648",
+  "@typeHistoryExample": {
+    "description": "Example on the empty deck tile."
+  },
+  "languageLatin": "Latijn",
+  "@languageLatin": {
+    "description": "Language."
+  },
+  "languageGerman": "Duits",
+  "@languageGerman": {
+    "description": "Language."
+  },
+  "languageFrench": "Frans",
+  "@languageFrench": {
+    "description": "Language."
+  },
+  "languageEnglish": "Engels",
+  "@languageEnglish": {
+    "description": "Language."
+  },
+  "languageDutch": "Nederlands",
+  "@languageDutch": {
+    "description": "Language."
+  },
+  "overflowShort": "Past niet",
+  "@overflowShort": {
+    "description": "Overflow badge on a card row."
+  },
+  "overflowLong": "Past niet op de kaart — maak het korter.",
+  "@overflowLong": {
+    "description": "Overflow badge in the entry screens."
+  },
+  "bold": "Vet",
+  "@bold": {
+    "description": "Toolbar button."
+  },
+  "italic": "Cursief",
+  "@italic": {
+    "description": "Toolbar button."
+  },
+  "fieldNlShort": "NL",
+  "@fieldNlShort": {
+    "description": "Grid header: Dutch word (short, may wrap)."
+  },
+  "fieldNl": "Nederlands woord",
+  "@fieldNl": {
+    "description": "Field: the Dutch word."
+  },
+  "fieldNlPluralShort": "NL mv.",
+  "@fieldNlPluralShort": {
+    "description": "Short label: Dutch plural."
+  },
+  "fieldNlPlural": "Nederlands meervoud",
+  "@fieldNlPlural": {
+    "description": "Field: the Dutch plural."
+  },
+  "fieldWordShort": "Woord",
+  "@fieldWordShort": {
+    "description": "Grid header: the word in the target language."
+  },
+  "fieldTargetWord": "Woord ({language})",
+  "@fieldTargetWord": {
+    "description": "Field: the word in a language.",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldPluralShort": "Mv.",
+  "@fieldPluralShort": {
+    "description": "Grid header: plural."
+  },
+  "fieldTargetPlural": "Meervoud ({language})",
+  "@fieldTargetPlural": {
+    "description": "Field: the plural in a language.",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldArticleShort": "Lidw.",
+  "@fieldArticleShort": {
+    "description": "Grid header: article."
+  },
+  "fieldArticle": "Lidwoord",
+  "@fieldArticle": {
+    "description": "Field: article, e.g. der, la."
+  },
+  "fieldGenderShort": "m/f/n",
+  "@fieldGenderShort": {
+    "description": "Grid header: gender."
+  },
+  "fieldGender": "Geslacht (m/f/n)",
+  "@fieldGender": {
+    "description": "Field: grammatical gender, typed as m, f or n."
+  },
+  "fieldGenitiveShort": "Gen.",
+  "@fieldGenitiveShort": {
+    "description": "Grid header: Latin genitive."
+  },
+  "fieldGenitive": "Genitivus",
+  "@fieldGenitive": {
+    "description": "Field: Latin genitive."
+  },
+  "fieldTerm": "Begrip",
+  "@fieldTerm": {
+    "description": "Field."
+  },
+  "fieldExplanation": "Uitleg",
+  "@fieldExplanation": {
+    "description": "Field."
+  },
+  "fieldHeading": "Betekenis of infinitief",
+  "@fieldHeading": {
+    "description": "Paradigm field: the front."
+  },
+  "fieldForms": "Vormen",
+  "@fieldForms": {
+    "description": "Paradigm: the label/value rows."
+  },
+  "fieldFormLabel": "Label",
+  "@fieldFormLabel": {
+    "description": "Placeholder: paradigm row label, e.g. perf."
+  },
+  "fieldFormValue": "Vorm",
+  "@fieldFormValue": {
+    "description": "Placeholder: paradigm row value."
+  },
+  "formLabelSemantics": "Regel {row}, label",
+  "@formLabelSemantics": {
+    "description": "VoiceOver: a paradigm row label.",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      }
+    }
+  },
+  "formValueSemantics": "Regel {row}, vorm",
+  "@formValueSemantics": {
+    "description": "VoiceOver: a paradigm row value.",
+    "placeholders": {
+      "row": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldSentenceNl": "Nederlandse zin",
+  "@fieldSentenceNl": {
+    "description": "Field."
+  },
+  "fieldSentenceTarget": "Vertaling",
+  "@fieldSentenceTarget": {
+    "description": "Field."
+  },
+  "fieldGrammarPoint": "Grammaticapunt (optioneel)",
+  "@fieldGrammarPoint": {
+    "description": "Field."
+  },
+  "fieldDate": "Datum, periode of tijdvak",
+  "@fieldDate": {
+    "description": "Field."
+  },
+  "fieldEvent": "Gebeurtenis",
+  "@fieldEvent": {
+    "description": "Field."
+  },
+  "fieldContext": "Context (optioneel)",
+  "@fieldContext": {
+    "description": "Field."
+  },
+  "moreFields": "Meer velden",
+  "@moreFields": {
+    "description": "Disclosure: show the other fields."
+  },
+  "fewerFields": "Minder velden",
+  "@fewerFields": {
+    "description": "Disclosure: hide the other fields."
+  },
+  "rowIncomplete": "Niet compleet, niet bewaard",
+  "@rowIncomplete": {
+    "description": "A draft with a blank required field."
+  },
+  "cardIncomplete": "Vul de verplichte velden in om de kaart te bewaren.",
+  "@cardIncomplete": {
+    "description": "Form: a required field is blank."
+  },
+  "addRow": "Regel toevoegen",
+  "@addRow": {
+    "description": "Paradigm: add a row."
+  },
+  "removeRow": "Regel verwijderen",
+  "@removeRow": {
+    "description": "Paradigm: remove a row."
+  },
+  "nextCard": "Volgende",
+  "@nextCard": {
+    "description": "Button: save and start the next card."
+  },
+  "showPreview": "Voorbeeld tonen",
+  "@showPreview": {
+    "description": "Button."
+  },
+  "hidePreview": "Voorbeeld verbergen",
+  "@hidePreview": {
+    "description": "Button."
+  },
+  "fields": "Velden",
+  "@fields": {
+    "description": "Segment: the form fields."
+  },
+  "preview": "Voorbeeld",
+  "@preview": {
+    "description": "Segment and button: the preview."
+  },
+  "previewEmpty": "Nog niets om te tonen",
+  "@previewEmpty": {
+    "description": "VoiceOver label of an empty preview."
+  },
+  "previewLabel": "Voorbeeld van de kaart: {content}",
+  "@previewLabel": {
+    "description": "VoiceOver label of the card preview.",
+    "placeholders": {
+      "content": {
+        "type": "String"
+      }
+    }
+  },
+  "incompleteTitle": "{count, plural, =1{1 kaart is niet compleet} other{{count} kaarten zijn niet compleet}}",
+  "@incompleteTitle": {
+    "description": "Done with incomplete drafts.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "incompleteMessage": "Die worden niet bewaard.",
+  "@incompleteMessage": {
+    "description": "Done with incomplete drafts."
+  },
+  "keepEditing": "Verder bewerken",
+  "@keepEditing": {
+    "description": "Button."
+  },
+  "discard": "Weggooien",
+  "@discard": {
+    "description": "Button."
+  },
+  "cardGone": "Deze kaart bestaat niet meer.",
+  "@cardGone": {
+    "description": "Editor: the card was deleted."
+  },
+  "printWhat": "Wat",
+  "@printWhat": {
+    "description": "Print set-up section: which decks."
+  },
+  "printNothing": "Er zijn nog geen stapels.",
+  "@printNothing": {
+    "description": "Print set-up without decks."
+  },
+  "printDoesntFit": "Past niet",
+  "@printDoesntFit": {
+    "description": "Print set-up section: overflowing cards."
+  },
+  "printDoesntFitHint": "Deze kaarten worden overgeslagen, tenzij je Overslaan uitzet.",
+  "@printDoesntFitHint": {
+    "description": "Under the overflowing cards."
+  },
+  "fix": "Aanpassen",
+  "@fix": {
+    "description": "Button: open the card to shorten it."
+  },
+  "skip": "Overslaan",
+  "@skip": {
+    "description": "Switch label: leave the card out."
+  },
+  "printDirection": "Richting",
+  "@printDirection": {
+    "description": "Print set-up section."
+  },
+  "frontShows": "Voorkant: {side}",
+  "@frontShows": {
+    "description": "Direction line.",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "backShows": "Achterkant: {side}",
+  "@backShows": {
+    "description": "Direction line.",
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "directionQuestion": "vraag",
+  "@directionQuestion": {
+    "description": "Direction for cards without a language: the question side."
+  },
+  "directionAnswer": "antwoord",
+  "@directionAnswer": {
+    "description": "Direction for cards without a language: the answer side."
+  },
+  "swapSides": "Voor- en achterkant wisselen",
+  "@swapSides": {
+    "description": "Button ⇄."
+  },
+  "fronts": "Voorkanten",
+  "@fronts": {
+    "description": "Preview toggle."
+  },
+  "backs": "Achterkanten",
+  "@backs": {
+    "description": "Preview toggle."
+  },
+  "checklist": "Controleer in het printvenster",
+  "@checklist": {
+    "description": "Header of the print checklist."
+  },
+  "checkDuplex": "Dubbelzijdig, omslaan als een boek",
+  "@checkDuplex": {
+    "description": "Checklist item."
+  },
+  "checkA4": "A4",
+  "@checkA4": {
+    "description": "Checklist item."
+  },
+  "checkScale": "Schaal niet aanpassen (100%)",
+  "@checkScale": {
+    "description": "Checklist item."
+  },
+  "sharePdf": "PDF delen",
+  "@sharePdf": {
+    "description": "Button."
+  },
+  "shareFile": "{name} delen",
+  "@shareFile": {
+    "description": "Button: share a named file.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noDuplex": "Mijn printer kan niet dubbelzijdig printen",
+  "@noDuplex": {
+    "description": "Menu item and sheet title."
+  },
+  "manualStepFronts": "1. Print de voorkanten",
+  "@manualStepFronts": {
+    "description": "Manual double-sided, step 1."
+  },
+  "manualStepTurn": "2. Draai de stapel om, zo",
+  "@manualStepTurn": {
+    "description": "Manual double-sided, step 2."
+  },
+  "manualStepTurnHint": "Leg de vellen terug in de lade, omgeslagen langs de lange kant, met de lege kant naar de printkant.",
+  "@manualStepTurnHint": {
+    "description": "Under the illustration."
+  },
+  "manualStepBacks": "3. Print de achterkanten",
+  "@manualStepBacks": {
+    "description": "Manual double-sided, step 3."
+  },
+  "frontsFileName": "voorkanten",
+  "@frontsFileName": {
+    "description": "File name without .pdf."
+  },
+  "backsFileName": "achterkanten",
+  "@backsFileName": {
+    "description": "File name without .pdf."
+  },
+  "pdfFileName": "flitskaarten",
+  "@pdfFileName": {
+    "description": "File name of the print PDF without .pdf."
+  },
+  "howToCut": "Zo snijd je de kaarten",
+  "@howToCut": {
+    "description": "Cutting guide title and link."
+  },
+  "cutEdges": "Snijd de randen af, langs de streepjes.",
+  "@cutEdges": {
+    "description": "Cutting guide step."
+  },
+  "cutColumns": "Snijd het vel in twee kolommen.",
+  "@cutColumns": {
+    "description": "Cutting guide step."
+  },
+  "cutRows": "Snijd elke kolom in vier kaarten.",
+  "@cutRows": {
+    "description": "Cutting guide step."
+  },
+  "notCalibrated": "Je printer is nog niet gekalibreerd: de achterkanten kunnen iets verschoven zijn.",
+  "@notCalibrated": {
+    "description": "Banner on the print preview."
+  },
+  "calibrate": "Kalibreren",
+  "@calibrate": {
+    "description": "Banner action."
+  },
+  "calibration": "Kalibratie",
+  "@calibration": {
+    "description": "Settings section."
+  },
+  "calibrationHint": "Print het testvel dubbelzijdig. Houd het tegen het licht met de achterkant naar je toe en lees bij A–D af waar het kruis van de voorkant op de schaal valt.",
+  "@calibrationHint": {
+    "description": "Under the calibration form."
+  },
+  "printTestSheet": "Testvel printen",
+  "@printTestSheet": {
+    "description": "Settings button."
+  },
+  "backOffsetX": "Achterkant X",
+  "@backOffsetX": {
+    "description": "Calibration field."
+  },
+  "backOffsetXHint": "Plus is naar rechts",
+  "@backOffsetXHint": {
+    "description": "Calibration field hint."
+  },
+  "backOffsetY": "Achterkant Y",
+  "@backOffsetY": {
+    "description": "Calibration field."
+  },
+  "backOffsetYHint": "Plus is omlaag",
+  "@backOffsetYHint": {
+    "description": "Calibration field hint."
+  },
+  "decrease": "Verlagen",
+  "@decrease": {
+    "description": "VoiceOver: − button."
+  },
+  "increase": "Verhogen",
+  "@increase": {
+    "description": "VoiceOver: + button."
+  },
+  "keyboardShortcuts": "Toetscombinaties",
+  "@keyboardShortcuts": {
+    "description": "Settings section."
+  },
+  "shortcutBoldItalic": "Vet / cursief",
+  "@shortcutBoldItalic": {
+    "description": "Shortcut list."
+  },
+  "shortcutNextCard": "Bewaren en volgende kaart",
+  "@shortcutNextCard": {
+    "description": "Shortcut list."
+  },
+  "about": "Over",
+  "@about": {
+    "description": "Settings section."
+  },
+  "licences": "Licenties",
+  "@licences": {
+    "description": "Settings item."
+  },
+  "sheetNumber": "Vel {number}",
+  "@sheetNumber": {
+    "description": "Under a sheet thumbnail.",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "sheetThumbnail": "Voorbeeld van vel {number}",
+  "@sheetThumbnail": {
+    "description": "VoiceOver: a sheet thumbnail.",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "testSheetFileName": "testvel",
+  "@testSheetFileName": {
+    "description": "File name of the test sheet."
   },
   "testSheetFrontTitle": "Testvel · voorkant · dubbelzijdig, omslaan langs de lange kant, schaal 100%",
   "@testSheetFrontTitle": {

@@ -5,6 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../domain/flashcard.dart';
 import 'card_size.dart';
+import 'cut_ticks.dart';
 import 'grid.dart';
 import 'templates/card_frame.dart';
 import 'templates/templates.dart';
@@ -33,7 +34,8 @@ enum SheetPages {
 }
 
 /// Number of A4 sheets for [cardCount] cards.
-int sheetCount(int cardCount) => (cardCount + cardsPerSheet - 1) ~/ cardsPerSheet;
+int sheetCount(int cardCount) =>
+    (cardCount + cardsPerSheet - 1) ~/ cardsPerSheet;
 
 /// Builds the print document. Every page has the same grid; backs sit in
 /// the mirrored column (flip on the long edge) and are moved by the
@@ -56,7 +58,9 @@ Future<Uint8List> buildSheets(
   for (var start = 0; start < cards.length; start += cardsPerSheet) {
     final sheet = cards.sublist(
       start,
-      start + cardsPerSheet > cards.length ? cards.length : start + cardsPerSheet,
+      start + cardsPerSheet > cards.length
+          ? cards.length
+          : start + cardsPerSheet,
     );
     for (final side in sides) {
       doc.addPage(_page(sheet, side, grid: grid, swap: swap));
@@ -95,34 +99,6 @@ pw.Widget _side(PrintCard print, Side side, bool swap) {
 
 pw.Widget _placed(MmRect rect, pw.Widget child) =>
     pw.Positioned(left: rect.left * _mm, top: rect.top * _mm, child: child);
-
-/// Cut ticks in the margins, 1 mm away from the grid and 5 mm long, at every
-/// cut line.
-void paintCutTicks(PdfGraphics canvas, SheetGrid grid, Side side) {
-  final columns = grid.columnEdges(side);
-  final rows = grid.rowEdges(side);
-  final left = columns.first, right = columns.last;
-  final top = rows.first, bottom = rows.last;
-
-  void line(double x1, double y1, double x2, double y2) {
-    canvas
-      ..moveTo(x1 * _mm, (pageHeightMm - y1) * _mm)
-      ..lineTo(x2 * _mm, (pageHeightMm - y2) * _mm)
-      ..strokePath();
-  }
-
-  canvas
-    ..setStrokeColor(PdfColors.black)
-    ..setLineWidth(0.25);
-  for (final x in columns) {
-    line(x, top - 1, x, top - 6);
-    line(x, bottom + 1, x, bottom + 6);
-  }
-  for (final y in rows) {
-    line(left - 1, y, left - 6, y);
-    line(right + 1, y, right + 6, y);
-  }
-}
 
 /// One card at its printed size: page 1 is the front, page 2 the back. Used
 /// for the preview while entering a card.

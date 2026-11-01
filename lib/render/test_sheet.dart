@@ -4,8 +4,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import 'card_size.dart';
+import 'cut_ticks.dart';
 import 'grid.dart';
-import 'sheet.dart';
 
 const _mm = PdfPageFormat.mm;
 const _hairline = 0.25;
