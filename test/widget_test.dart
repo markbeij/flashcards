@@ -13,6 +13,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Flitskaarten'), findsOneWidget);
-    expect(find.text('Nieuwe map'), findsOneWidget);
+    expect(find.text('Printtest'), findsOneWidget);
   });
 }

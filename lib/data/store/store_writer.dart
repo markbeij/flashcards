@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 
 import '../../domain/flashcard.dart';
-import '../../domain/folder.dart';
+import '../../domain/deck.dart';
 import 'library.dart';
 import 'library_files.dart';
 import 'settings.dart';
@@ -19,7 +19,7 @@ class StoreWriter {
     Library saved, {
     this.debounce = const Duration(milliseconds: 500),
   }) : _latest = saved,
-       _folders = saved.folders,
+       _decks = saved.decks,
        _settings = saved.settings,
        _cards = Map.of(saved.cards) {
     _lifecycle = AppLifecycleListener(onInactive: _flushNow, onHide: _flushNow);
@@ -34,7 +34,7 @@ class StoreWriter {
   Future<void> _queue = Future.value();
 
   // What the files hold now.
-  Map<String, Folder> _folders;
+  Map<String, Deck> _decks;
   Settings _settings;
   final Map<String, Map<String, Flashcard>> _cards;
 
@@ -76,32 +76,33 @@ class StoreWriter {
   }
 
   // Order matters when the app is killed halfway through:
-  // - folders.json first, so a card file never belongs to an unknown folder;
+  // - decks.json first, so a card file never belongs to an unknown deck;
   // - files that gained cards before files that lost cards, so a moved card
   //   is never missing from both;
-  // - card files of deleted folders last.
+  // - card files of deleted decks, and of decks that lost their last card,
+  //   last.
   Future<void> _writeChanges(Library next) async {
-    if (!identical(next.folders, _folders)) {
-      await _files.writeFolders(next.folders.values);
-      _folders = next.folders;
+    if (!identical(next.decks, _decks)) {
+      await _files.writeDecks(next.decks.values);
+      _decks = next.decks;
     }
 
     final changed = [
-      for (final MapEntry(key: folderId, value: cards) in next.cards.entries)
-        if (!identical(cards, _cards[folderId])) folderId,
+      for (final MapEntry(key: deckId, value: cards) in next.cards.entries)
+        if (!identical(cards, _cards[deckId])) deckId,
     ];
-    bool gained(String folderId) {
-      final saved = _cards[folderId] ?? const {};
-      return next.cards[folderId]!.keys.any((uuid) => !saved.containsKey(uuid));
+    bool gained(String deckId) {
+      final saved = _cards[deckId] ?? const {};
+      return next.cards[deckId]!.keys.any((uuid) => !saved.containsKey(uuid));
     }
 
-    for (final folderId in [
+    for (final deckId in [
       ...changed.where(gained),
-      ...changed.where((folderId) => !gained(folderId)),
+      ...changed.where((deckId) => !gained(deckId)),
     ]) {
-      final cards = next.cards[folderId]!;
-      await _files.writeCards(folderId, cards.values);
-      _cards[folderId] = cards;
+      final cards = next.cards[deckId]!;
+      await _files.writeCards(deckId, cards.values);
+      _cards[deckId] = cards;
     }
 
     if (!identical(next.settings, _settings)) {
@@ -109,12 +110,12 @@ class StoreWriter {
       _settings = next.settings;
     }
 
-    for (final folderId in [
-      for (final folderId in _cards.keys)
-        if (!next.cards.containsKey(folderId)) folderId,
+    for (final deckId in [
+      for (final deckId in _cards.keys)
+        if (!next.cards.containsKey(deckId)) deckId,
     ]) {
-      await _files.deleteCards(folderId);
-      _cards.remove(folderId);
+      await _files.deleteCards(deckId);
+      _cards.remove(deckId);
     }
   }
 }

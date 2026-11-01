@@ -171,33 +171,22 @@ class VocabularyContent extends CardContent {
 }
 
 class BegripContent extends CardContent {
-  const BegripContent({
-    this.term = '',
-    this.explanation = '',
-    this.subject = '',
-  });
+  const BegripContent({this.term = '', this.explanation = ''});
 
   factory BegripContent.fromJson(Map<String, Object?> json) => BegripContent(
     term: _string(json, 'term'),
     explanation: _string(json, 'explanation'),
-    subject: _string(json, 'subject'),
   );
 
   final String term;
   final String explanation;
 
-  /// Optional.
-  final String subject;
-
   @override
   CardType get type => CardType.begrip;
 
   @override
-  Map<String, Object?> toJson() => _omitBlank({
-    'term': term,
-    'explanation': explanation,
-    'subject': subject,
-  });
+  Map<String, Object?> toJson() =>
+      _omitBlank({'term': term, 'explanation': explanation});
 
   @override
   List<ValidationIssue> validate() => [
@@ -209,11 +198,10 @@ class BegripContent extends CardContent {
   bool operator ==(Object other) =>
       other is BegripContent &&
       other.term == term &&
-      other.explanation == explanation &&
-      other.subject == subject;
+      other.explanation == explanation;
 
   @override
-  int get hashCode => Object.hash(term, explanation, subject);
+  int get hashCode => Object.hash(term, explanation);
 }
 
 /// One line of a paradigm's forms table, e.g. "perf." → "amavi".

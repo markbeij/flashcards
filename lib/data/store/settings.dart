@@ -24,41 +24,31 @@ class Calibration {
   int get hashCode => Object.hash(backDxMm, backDyMm);
 }
 
-/// The "What" of the last print job: ticked folders and tag chips.
+/// The "What" of the last print job: the ticked decks.
 class PrintSelection {
-  PrintSelection({
-    List<String> folderIds = const [],
-    List<String> tags = const [],
-  }) : folderIds = List.unmodifiable(folderIds),
-       tags = List.unmodifiable(tags);
+  PrintSelection({List<String> deckIds = const []})
+    : deckIds = List.unmodifiable(deckIds);
 
   factory PrintSelection.fromJson(Map<String, Object?> json) => PrintSelection(
-    folderIds: [
-      for (final id in json['folderIds'] as List<Object?>) id as String,
-    ],
-    tags: [for (final tag in json['tags'] as List<Object?>) tag as String],
+    deckIds: [for (final id in json['deckIds'] as List<Object?>) id as String],
   );
 
-  final List<String> folderIds;
-  final List<String> tags;
+  final List<String> deckIds;
 
-  Map<String, Object?> toJson() => {'folderIds': folderIds, 'tags': tags};
+  Map<String, Object?> toJson() => {'deckIds': deckIds};
 
   @override
   bool operator ==(Object other) =>
-      other is PrintSelection &&
-      listEquals(other.folderIds, folderIds) &&
-      listEquals(other.tags, tags);
+      other is PrintSelection && listEquals(other.deckIds, deckIds);
 
   @override
-  int get hashCode =>
-      Object.hash(Object.hashAll(folderIds), Object.hashAll(tags));
+  int get hashCode => Object.hashAll(deckIds);
 }
 
 class Settings {
   const Settings({
     this.calibration,
-    this.lastFolderId,
+    this.lastDeckId,
     this.lastCardId,
     this.lastPrintSelection,
     this.cuttingGuideShown = false,
@@ -69,7 +59,7 @@ class Settings {
       null => null,
       final Object c => Calibration.fromJson(c as Map<String, Object?>),
     },
-    lastFolderId: json['lastFolderId'] as String?,
+    lastDeckId: json['lastDeckId'] as String?,
     lastCardId: json['lastCardId'] as String?,
     lastPrintSelection: switch (json['lastPrintSelection']) {
       null => null,
@@ -80,14 +70,14 @@ class Settings {
 
   /// null until the user has calibrated; the print screen then shows a banner.
   final Calibration? calibration;
-  final String? lastFolderId;
+  final String? lastDeckId;
   final String? lastCardId;
   final PrintSelection? lastPrintSelection;
   final bool cuttingGuideShown;
 
   Settings copyWith({
     Object? calibration = _unchanged,
-    Object? lastFolderId = _unchanged,
+    Object? lastDeckId = _unchanged,
     Object? lastCardId = _unchanged,
     Object? lastPrintSelection = _unchanged,
     bool? cuttingGuideShown,
@@ -95,9 +85,9 @@ class Settings {
     calibration: calibration == _unchanged
         ? this.calibration
         : calibration as Calibration?,
-    lastFolderId: lastFolderId == _unchanged
-        ? this.lastFolderId
-        : lastFolderId as String?,
+    lastDeckId: lastDeckId == _unchanged
+        ? this.lastDeckId
+        : lastDeckId as String?,
     lastCardId: lastCardId == _unchanged
         ? this.lastCardId
         : lastCardId as String?,
@@ -109,7 +99,7 @@ class Settings {
 
   Map<String, Object?> toJson() => {
     if (calibration != null) 'calibration': calibration!.toJson(),
-    if (lastFolderId != null) 'lastFolderId': lastFolderId,
+    if (lastDeckId != null) 'lastDeckId': lastDeckId,
     if (lastCardId != null) 'lastCardId': lastCardId,
     if (lastPrintSelection != null)
       'lastPrintSelection': lastPrintSelection!.toJson(),
@@ -120,7 +110,7 @@ class Settings {
   bool operator ==(Object other) =>
       other is Settings &&
       other.calibration == calibration &&
-      other.lastFolderId == lastFolderId &&
+      other.lastDeckId == lastDeckId &&
       other.lastCardId == lastCardId &&
       other.lastPrintSelection == lastPrintSelection &&
       other.cuttingGuideShown == cuttingGuideShown;
@@ -128,7 +118,7 @@ class Settings {
   @override
   int get hashCode => Object.hash(
     calibration,
-    lastFolderId,
+    lastDeckId,
     lastCardId,
     lastPrintSelection,
     cuttingGuideShown,

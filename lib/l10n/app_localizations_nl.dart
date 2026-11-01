@@ -13,12 +13,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get appTitle => 'Flitskaarten';
 
   @override
-  String get libraryEmpty => 'Maak een map per vak, bijvoorbeeld Latijn.';
-
-  @override
-  String get newFolder => 'Nieuwe map';
-
-  @override
   String get printTest => 'Printtest';
 
   @override

@@ -1,8 +1,6 @@
 {
   "@@locale": "en",
   "appTitle": "Flashcards",
-  "libraryEmpty": "Make a folder per subject, for example Latin.",
-  "newFolder": "New folder",
   "printTest": "Print test",
   "testSheetFrontTitle": "Test sheet · front · double-sided, flip on long edge, scale 100%",
   "testSheetBackTitle": "Test sheet · back"

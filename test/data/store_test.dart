@@ -7,7 +7,7 @@ import 'package:flashcards/data/store/library_notifier.dart';
 import 'package:flashcards/data/store/settings.dart';
 import 'package:flashcards/data/store/store_writer.dart';
 import 'package:flashcards/domain/card_content.dart';
-import 'package:flashcards/domain/folder.dart';
+import 'package:flashcards/domain/deck.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,65 +47,68 @@ void main() {
     return (container.read(libraryProvider.notifier), writer, container);
   }
 
-  File cardFile(String folderId) => File('${root.path}/cards/$folderId.json');
+  File cardFile(String deckId) => File('${root.path}/cards/$deckId.json');
 
   Map<String, Object?> readJson(File file) =>
       jsonDecode(file.readAsStringSync()) as Map<String, Object?>;
 
-  List<int> seqsOnDisk(String folderId) => [
-    for (final card in readJson(cardFile(folderId))['cards'] as List<Object?>)
+  List<int> seqsOnDisk(String deckId) => [
+    for (final card in readJson(cardFile(deckId))['cards'] as List<Object?>)
       (card as Map<String, Object?>)['seq'] as int,
   ];
 
+  Deck deck(LibraryNotifier notifier, String title) =>
+      notifier.createDeck(map: 'VWO 4', submap: 'Latijn', title: title);
+
   group('atomic write', () {
     test('an interrupted save leaves the old file intact', () async {
-      final file = File('${root.path}/folders.json');
+      final file = File('${root.path}/decks.json');
       await writeAtomically(
         file,
-        utf8.encode('{"formatVersion":1,"folders":[]}'),
+        utf8.encode('{"formatVersion":1,"decks":[]}'),
       );
 
       await expectLater(
         writeAtomically(
           file,
           utf8.encode(
-            '{"formatVersion":1,"folders":[{"id":"x","name":"new"}]}',
+            '{"formatVersion":1,"decks":[{"id":"x","map":"m","submap":"s","title":"t"}]}',
           ),
           beforeRename: () => throw const FileSystemException('killed'),
         ),
         throwsA(isA<FileSystemException>()),
       );
 
-      expect(file.readAsStringSync(), '{"formatVersion":1,"folders":[]}');
+      expect(file.readAsStringSync(), '{"formatVersion":1,"decks":[]}');
       final library = await LibraryFiles(root).load();
-      expect(library.folders, isEmpty);
+      expect(library.decks, isEmpty);
     });
 
     test('a leftover temp file is ignored and later replaced', () async {
       final (notifier, writer, _) = await open();
-      final folder = notifier.createFolder('Latijn');
-      notifier.addCard(folder.id, _word);
+      final h3 = deck(notifier, 'Woordjes H3');
+      notifier.addCard(h3.id, _word);
       await writer.flush();
-      File('${cardFile(folder.id).path}.tmp').writeAsStringSync('{"formatVer');
+      File('${cardFile(h3.id).path}.tmp').writeAsStringSync('{"formatVer');
 
       final library = await LibraryFiles(root).load();
-      expect(library.cardsIn(folder.id), hasLength(1));
+      expect(library.cardsIn(h3.id), hasLength(1));
 
-      notifier.addCard(folder.id, _word);
+      notifier.addCard(h3.id, _word);
       await writer.flush();
-      expect(seqsOnDisk(folder.id), [1, 2]);
-      expect(File('${cardFile(folder.id).path}.tmp').existsSync(), isFalse);
+      expect(seqsOnDisk(h3.id), [1, 2]);
+      expect(File('${cardFile(h3.id).path}.tmp').existsSync(), isFalse);
     });
   });
 
   group('writer', () {
     test('saves a short while after a change', () async {
       final (notifier, _, _) = await open();
-      notifier.createFolder('Latijn');
-      expect(File('${root.path}/folders.json').existsSync(), isFalse);
+      deck(notifier, 'Woordjes H3');
+      expect(File('${root.path}/decks.json').existsSync(), isFalse);
 
       await Future<void>.delayed(const Duration(milliseconds: 800));
-      expect(File('${root.path}/folders.json').existsSync(), isTrue);
+      expect(File('${root.path}/decks.json').existsSync(), isTrue);
     });
 
     test('saves right away when the app goes to the background', () async {
@@ -124,18 +127,18 @@ void main() {
       final binding = TestWidgetsFlutterBinding.instance;
       binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
 
-      container.read(libraryProvider.notifier).createFolder('Latijn');
+      deck(container.read(libraryProvider.notifier), 'Woordjes H3');
       binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
       await writer.idle;
 
-      expect(File('${root.path}/folders.json').existsSync(), isTrue);
+      expect(File('${root.path}/decks.json').existsSync(), isTrue);
       binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     });
 
     test('writes only changed files', () async {
       final (notifier, writer, _) = await open();
-      final a = notifier.createFolder('A');
-      final b = notifier.createFolder('B');
+      final a = deck(notifier, 'A');
+      final b = deck(notifier, 'B');
       notifier.addCard(a.id, _word);
       notifier.addCard(b.id, _word);
       await writer.flush();
@@ -152,16 +155,15 @@ void main() {
 
   test('reload after restart gives the same library', () async {
     final (notifier, writer, container) = await open();
-    final latin = notifier.createFolder('Latijn');
-    notifier.updateFolder(
-      latin.copyWith(
-        color: FolderColor.red,
+    final h3 = deck(notifier, 'Woordjes H3');
+    notifier.updateDeck(
+      h3.copyWith(
         lastCardType: CardType.vocabulary,
         lastLanguage: VocabLanguage.latin,
       ),
     );
-    final h3 = notifier.createFolder('H3', parentId: latin.id);
-    final card = notifier.addCard(h3.id, _word, tags: ['toets 3']);
+    final h4 = deck(notifier, 'Woordjes H4');
+    final card = notifier.addCard(h3.id, _word);
     notifier.addCard(
       h3.id,
       ParadigmContent(
@@ -174,12 +176,9 @@ void main() {
         calibration: Calibration(backDyMm: 1),
         cuttingGuideShown: true,
       ).copyWith(
-        lastFolderId: h3.id,
+        lastDeckId: h3.id,
         lastCardId: card.uuid,
-        lastPrintSelection: PrintSelection(
-          folderIds: [latin.id],
-          tags: ['toets 3'],
-        ),
+        lastPrintSelection: PrintSelection(deckIds: [h3.id, h4.id]),
       ),
     );
     await writer.flush();
@@ -188,126 +187,121 @@ void main() {
     final (_, _, reopened) = await open();
     final after = reopened.read(libraryProvider);
 
-    expect(after.folders, before.folders);
+    expect(after.decks, before.decks);
     expect(after.cards, before.cards);
     expect(after.settings, before.settings);
-    for (final name in [
-      'folders.json',
-      'settings.json',
-      'cards/${h3.id}.json',
-    ]) {
+    for (final name in ['decks.json', 'settings.json', 'cards/${h3.id}.json']) {
       expect(readJson(File('${root.path}/$name'))['formatVersion'], 1);
     }
   });
 
   test('an unknown formatVersion is refused', () async {
-    File('${root.path}/folders.json')
+    File('${root.path}/decks.json')
       ..createSync(recursive: true)
-      ..writeAsStringSync('{"formatVersion":2,"folders":[]}');
+      ..writeAsStringSync('{"formatVersion":2,"decks":[]}');
     expect(LibraryFiles(root).load(), throwsFormatException);
   });
 
-  group('folders', () {
-    test(
-      'deleting a folder removes its subfolders and their card files',
-      () async {
-        final (notifier, writer, container) = await open();
-        final latin = notifier.createFolder('Latijn');
-        final vwo4 = notifier.createFolder('VWO 4', parentId: latin.id);
-        final h3 = notifier.createFolder('H3', parentId: vwo4.id);
-        final greek = notifier.createFolder('Grieks');
-        for (final folder in [latin, vwo4, h3, greek]) {
-          notifier.addCard(folder.id, _word);
-        }
-        final h3Card = container
+  group('decks', () {
+    test('deleting a deck removes its card file and forgets it', () async {
+      final (notifier, writer, container) = await open();
+      final h3 = deck(notifier, 'Woordjes H3');
+      final h4 = deck(notifier, 'Woordjes H4');
+      final h3Card = notifier.addCard(h3.id, _word);
+      notifier.addCard(h4.id, _word);
+      notifier.updateSettings(
+        container
             .read(libraryProvider)
-            .cardsIn(h3.id)
-            .keys
-            .single;
-        notifier.updateSettings(
-          container
-              .read(libraryProvider)
-              .settings
-              .copyWith(
-                lastFolderId: vwo4.id,
-                lastCardId: h3Card,
-                lastPrintSelection: PrintSelection(
-                  folderIds: [h3.id, greek.id],
-                ),
-              ),
-        );
-        await writer.flush();
+            .settings
+            .copyWith(
+              lastDeckId: h3.id,
+              lastCardId: h3Card.uuid,
+              lastPrintSelection: PrintSelection(deckIds: [h3.id, h4.id]),
+            ),
+      );
+      await writer.flush();
+      expect(cardFile(h3.id).existsSync(), isTrue);
 
-        notifier.deleteFolder(latin.id);
-        await writer.flush();
+      notifier.deleteDeck(h3.id);
+      await writer.flush();
 
-        final library = container.read(libraryProvider);
-        expect(library.folders.keys, [greek.id]);
-        expect(library.cards.keys, [greek.id]);
-        for (final folder in [latin, vwo4, h3]) {
-          expect(
-            cardFile(folder.id).existsSync(),
-            isFalse,
-            reason: folder.name,
-          );
-        }
-        expect(cardFile(greek.id).existsSync(), isTrue);
-        expect(library.settings.lastFolderId, isNull);
-        expect(library.settings.lastCardId, isNull);
-        expect(library.settings.lastPrintSelection!.folderIds, [greek.id]);
+      final library = container.read(libraryProvider);
+      expect(library.decks.keys, [h4.id]);
+      expect(library.cards.keys, [h4.id]);
+      expect(cardFile(h3.id).existsSync(), isFalse);
+      expect(cardFile(h4.id).existsSync(), isTrue);
+      expect(library.settings.lastDeckId, isNull);
+      expect(library.settings.lastCardId, isNull);
+      expect(library.settings.lastPrintSelection!.deckIds, [h4.id]);
 
-        final reloaded = await LibraryFiles(root).load();
-        expect(reloaded.folders.keys, [greek.id]);
-      },
-    );
+      final reloaded = await LibraryFiles(root).load();
+      expect(reloaded.decks.keys, [h4.id]);
+    });
 
-    test('a folder cannot move into itself or its subfolders', () async {
+    test('editing the map or submap moves the deck', () async {
       final (notifier, _, container) = await open();
-      final a = notifier.createFolder('A');
-      final b = notifier.createFolder('B', parentId: a.id);
-      expect(() => notifier.moveFolder(a.id, a.id), throwsArgumentError);
-      expect(() => notifier.moveFolder(a.id, b.id), throwsArgumentError);
+      final h3 = deck(notifier, 'Woordjes H3');
+      final card = notifier.addCard(h3.id, _word);
 
-      notifier.moveFolder(b.id, null);
-      expect(container.read(libraryProvider).folders[b.id]!.parentId, isNull);
+      notifier.updateDeck(h3.copyWith(map: 'VWO 5', submap: 'Grieks'));
+
+      final library = container.read(libraryProvider);
+      expect(mapsOf(library.decks.values), ['VWO 5']);
+      expect(submapsOf('VWO 5', library.decks.values), ['Grieks']);
+      expect(library.cardsIn(h3.id).keys, [card.uuid]);
+    });
+
+    test('map, submap and title are required', () async {
+      final (notifier, _, container) = await open();
+      expect(
+        () => notifier.createDeck(map: ' ', submap: 'Latijn', title: 'H3'),
+        throwsArgumentError,
+      );
+      expect(
+        () => notifier.createDeck(map: 'VWO 4', submap: '', title: 'H3'),
+        throwsArgumentError,
+      );
+      final h3 = deck(notifier, 'Woordjes H3');
+      expect(
+        () => notifier.updateDeck(h3.copyWith(title: '')),
+        throwsArgumentError,
+      );
+      expect(container.read(libraryProvider).decks.values, [h3]);
     });
   });
 
   group('cards', () {
     test('numbers keep their gaps after a delete', () async {
       final (notifier, _, container) = await open();
-      final folder = notifier.createFolder('H1');
+      final h1 = deck(notifier, 'H1');
       final cards = [
-        for (var i = 0; i < 3; i++) notifier.addCard(folder.id, _word),
+        for (var i = 0; i < 3; i++) notifier.addCard(h1.id, _word),
       ];
       expect(cards.map((c) => c.seq), [1, 2, 3]);
 
-      notifier.deleteCard(folder.id, cards[1].uuid);
-      final next = notifier.addCard(folder.id, _word);
+      notifier.deleteCard(h1.id, cards[1].uuid);
+      final next = notifier.addCard(h1.id, _word);
       expect(next.seq, 4);
       expect(
-        container
-            .read(libraryProvider)
-            .cardsIn(folder.id)
-            .values
-            .map((c) => c.seq),
+        container.read(libraryProvider).cardsIn(h1.id).values.map((c) => c.seq),
         unorderedEquals([1, 3, 4]),
       );
     });
 
     test('an update that changes nothing keeps the same state', () async {
       final (notifier, _, container) = await open();
-      final folder = notifier.createFolder('H1');
-      final card = notifier.addCard(folder.id, _word);
+      final h1 = deck(notifier, 'H1');
+      final card = notifier.addCard(h1.id, _word);
       final before = container.read(libraryProvider);
 
-      notifier.updateCard(folder.id, card.uuid, content: _word, tags: const []);
+      notifier.updateCard(h1.id, card.uuid, _word);
       expect(identical(container.read(libraryProvider), before), isTrue);
 
-      notifier.updateCard(folder.id, card.uuid, tags: ['toets']);
+      const changed = BegripContent(term: 't', explanation: 'e');
+      notifier.updateCard(h1.id, card.uuid, changed);
       expect(
-        container.read(libraryProvider).cardsIn(folder.id)[card.uuid]!.tags,
-        ['toets'],
+        container.read(libraryProvider).cardsIn(h1.id)[card.uuid]!.content,
+        changed,
       );
     });
 
@@ -315,8 +309,8 @@ void main() {
       'a moved card gets the next number and both files are rewritten',
       () async {
         final (notifier, writer, container) = await open();
-        final a = notifier.createFolder('A');
-        final b = notifier.createFolder('B');
+        final a = deck(notifier, 'A');
+        final b = deck(notifier, 'B');
         final aCards = [
           for (var i = 0; i < 3; i++) notifier.addCard(a.id, _word),
         ];
@@ -340,8 +334,8 @@ void main() {
 
     test('moving the last card out removes the empty card file', () async {
       final (notifier, writer, _) = await open();
-      final a = notifier.createFolder('A');
-      final b = notifier.createFolder('B');
+      final a = deck(notifier, 'A');
+      final b = deck(notifier, 'B');
       final card = notifier.addCard(a.id, _word);
       await writer.flush();
 
@@ -356,8 +350,8 @@ void main() {
 
     test('deleting the last opened card forgets it', () async {
       final (notifier, _, container) = await open();
-      final folder = notifier.createFolder('A');
-      final card = notifier.addCard(folder.id, _word);
+      final h1 = deck(notifier, 'A');
+      final card = notifier.addCard(h1.id, _word);
       notifier.updateSettings(
         container
             .read(libraryProvider)
@@ -365,15 +359,15 @@ void main() {
             .copyWith(lastCardId: card.uuid),
       );
 
-      notifier.deleteCard(folder.id, card.uuid);
+      notifier.deleteCard(h1.id, card.uuid);
       expect(container.read(libraryProvider).settings.lastCardId, isNull);
     });
   });
 
   test('a library is immutable', () {
     final library = Library(
-      folders: const {'a': Folder(id: 'a', name: 'a')},
+      decks: const {'a': Deck(id: 'a', map: 'm', submap: 's', title: 't')},
     );
-    expect(() => library.folders.clear(), throwsUnsupportedError);
+    expect(() => library.decks.clear(), throwsUnsupportedError);
   });
 }

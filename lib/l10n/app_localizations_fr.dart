@@ -13,12 +13,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get appTitle => 'Cartes mémoire';
 
   @override
-  String get libraryEmpty => 'Créez un dossier par matière, par exemple Latin.';
-
-  @override
-  String get newFolder => 'Nouveau dossier';
-
-  @override
   String get printTest => 'Test d\'impression';
 
   @override

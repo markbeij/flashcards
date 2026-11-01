@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import 'card_size.dart';
 import 'grid.dart';
-import 'presets.dart';
 
 const _mm = PdfPageFormat.mm;
 const _hairline = 0.25;
@@ -13,7 +13,7 @@ const _hairline = 0.25;
 /// to calibrate the back side.
 ///
 /// Front: crosshairs A–D, a 190 mm horizontal and a 270 mm vertical ruler,
-/// cut ticks for the M grid and six sample cards.
+/// cut ticks for the card grid and six sample cards.
 /// Back: at the mirrored position of each crosshair, an offset scale from
 /// −5 to +5 mm in 0.5 mm steps. Hold the sheet against the light with the back
 /// facing you and read where the front cross lands. Readings are in back-page
@@ -24,7 +24,7 @@ Future<Uint8List> buildTestSheet(
   required String frontTitle,
   required String backTitle,
 }) {
-  const grid = SheetGrid(presetM);
+  const grid = SheetGrid();
   final doc = pw.Document(theme: theme, title: frontTitle);
   for (final side in Side.values) {
     doc.addPage(
@@ -86,7 +86,7 @@ String _signed(int value) => value > 0 ? '+$value' : '−${-value}';
 
 /// Crosshair centres: the cells of the first and last row.
 (double, double) _targetPoint(SheetGrid grid, int target, Side side) {
-  final last = grid.preset.cardsPerSheet - 2;
+  const last = cardsPerSheet - 2;
   final index = [0, 1, last, last + 1][target];
   final cell = grid.cell(index, side);
   return (cell.centerX, cell.centerY);
@@ -95,7 +95,8 @@ String _signed(int value) => value > 0 ? '+$value' : '−${-value}';
 double _rulerY(SheetGrid grid) => grid.cell(2, Side.front).centerY;
 double _vRulerTop(SheetGrid grid) => grid.top + (grid.bottom - grid.top - 270) / 2;
 
-const _firstSampleIndex = 4;
+/// The cards of the first row hold only targets A and B.
+const _firstSampleIndex = 2;
 const _sampleCards = [
   (('meisje', 'het meisje, de meisjes'), ('puella', 'puellae f.')),
   (('koning', 'de koning'), ('rēx', 'rēgis m.')),
@@ -122,7 +123,7 @@ pw.Widget _sampleCard(SheetGrid grid, int index, Side side, (String, String) tex
           pw.Text(text.$2, style: const pw.TextStyle(fontSize: 10)),
           pw.Spacer(),
           pw.Text(
-            'Test · M · #${index + 1}',
+            'Test · #${index + 1}',
             style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey700),
           ),
         ],

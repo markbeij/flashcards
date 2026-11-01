@@ -32,7 +32,6 @@ void main() {
       const BegripContent(
         term: 'fotosynthese',
         explanation: 'Omzetting van **licht** in *chemische* energie',
-        subject: 'biologie',
       ),
       ParadigmContent(
         heading: 'amare – liefhebben',
@@ -77,7 +76,6 @@ void main() {
         uuid: '7b0c8a0e-0000-4000-8000-000000000001',
         seq: 17,
         content: const HistoryContent(date: '1815', event: 'Waterloo'),
-        tags: const ['toets 3'],
         createdAt: DateTime.utc(2026, 10, 30, 12),
         updatedAt: DateTime.utc(2026, 10, 31, 9, 30),
       );
@@ -137,8 +135,8 @@ void main() {
       );
     });
 
-    test('begrip needs term and explanation, not subject', () {
-      expect(const BegripContent(subject: 'bio').validate(), const [
+    test('begrip needs term and explanation', () {
+      expect(const BegripContent().validate(), const [
         ValidationIssue('term'),
         ValidationIssue('explanation'),
       ]);

@@ -4,14 +4,6 @@
   "@appTitle": {
     "description": "App name shown in the navigation bar."
   },
-  "libraryEmpty": "Maak een map per vak, bijvoorbeeld Latijn.",
-  "@libraryEmpty": {
-    "description": "Empty state of the library."
-  },
-  "newFolder": "Nieuwe map",
-  "@newFolder": {
-    "description": "Button that creates a folder."
-  },
   "printTest": "Printtest",
   "@printTest": {
     "description": "Temporary button and screen title for Spike 0 (print fidelity test)."

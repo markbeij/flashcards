@@ -108,18 +108,6 @@ abstract class AppLocalizations {
   /// **'Flitskaarten'**
   String get appTitle;
 
-  /// Empty state of the library.
-  ///
-  /// In nl, this message translates to:
-  /// **'Maak een map per vak, bijvoorbeeld Latijn.'**
-  String get libraryEmpty;
-
-  /// Button that creates a folder.
-  ///
-  /// In nl, this message translates to:
-  /// **'Nieuwe map'**
-  String get newFolder;
-
   /// Temporary button and screen title for Spike 0 (print fidelity test).
   ///
   /// In nl, this message translates to:

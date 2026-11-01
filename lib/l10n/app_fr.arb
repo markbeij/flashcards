@@ -1,8 +1,6 @@
 {
   "@@locale": "fr",
   "appTitle": "Cartes mémoire",
-  "libraryEmpty": "Créez un dossier par matière, par exemple Latin.",
-  "newFolder": "Nouveau dossier",
   "printTest": "Test d'impression",
   "testSheetFrontTitle": "Feuille de test · recto · recto verso, reliure bord long, échelle 100 %",
   "testSheetBackTitle": "Feuille de test · verso"

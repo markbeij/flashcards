@@ -13,12 +13,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Flashcards';
 
   @override
-  String get libraryEmpty => 'Make a folder per subject, for example Latin.';
-
-  @override
-  String get newFolder => 'New folder';
-
-  @override
   String get printTest => 'Print test';
 
   @override

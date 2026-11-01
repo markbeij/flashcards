@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../domain/flashcard.dart';
-import '../../domain/folder.dart';
+import '../../domain/deck.dart';
 import 'library.dart';
 import 'settings.dart';
 
@@ -16,37 +16,34 @@ Future<Directory> libraryDirectory() async =>
     Directory('${(await getApplicationSupportDirectory()).path}/library');
 
 /// Reads and writes the library files under [root]:
-/// `folders.json`, `cards/<folderId>.json` and `settings.json`.
+/// `decks.json`, `cards/<deckId>.json` and `settings.json`.
 class LibraryFiles {
   LibraryFiles(this.root);
 
   final Directory root;
 
-  File get _folders => File('${root.path}/folders.json');
+  File get _decks => File('${root.path}/decks.json');
   File get _settings => File('${root.path}/settings.json');
-  File _cards(String folderId) => File('${root.path}/cards/$folderId.json');
+  File _cards(String deckId) => File('${root.path}/cards/$deckId.json');
 
   /// Loads everything. Missing files mean an empty library or default
-  /// settings. Card files of unknown folders are ignored.
+  /// settings. Card files of unknown decks are ignored.
   Future<Library> load() async {
-    final folders = <String, Folder>{
-      for (final folder in (await _readList(
-        _folders,
-        'folders',
-      )).map(Folder.fromJson))
-        folder.id: folder,
+    final decks = <String, Deck>{
+      for (final deck in (await _readList(_decks, 'decks')).map(Deck.fromJson))
+        deck.id: deck,
     };
     final cards = <String, Map<String, Flashcard>>{};
-    for (final folderId in folders.keys) {
-      final list = await _readList(_cards(folderId), 'cards');
+    for (final deckId in decks.keys) {
+      final list = await _readList(_cards(deckId), 'cards');
       if (list.isEmpty) continue;
-      cards[folderId] = Map.unmodifiable({
+      cards[deckId] = Map.unmodifiable({
         for (final card in list.map(Flashcard.fromJson)) card.uuid: card,
       });
     }
     final settingsJson = await _readFile(_settings);
     return Library(
-      folders: folders,
+      decks: decks,
       cards: cards,
       settings: settingsJson == null
           ? const Settings()
@@ -54,12 +51,12 @@ class LibraryFiles {
     );
   }
 
-  Future<void> writeFolders(Iterable<Folder> folders) => _write(_folders, {
-    'folders': [for (final folder in folders) folder.toJson()],
+  Future<void> writeDecks(Iterable<Deck> decks) => _write(_decks, {
+    'decks': [for (final deck in decks) deck.toJson()],
   });
 
-  Future<void> writeCards(String folderId, Iterable<Flashcard> cards) =>
-      _write(_cards(folderId), {
+  Future<void> writeCards(String deckId, Iterable<Flashcard> cards) =>
+      _write(_cards(deckId), {
         'cards': [
           for (final card
               in cards.toList()..sort((a, b) => a.seq.compareTo(b.seq)))
@@ -67,8 +64,8 @@ class LibraryFiles {
         ],
       });
 
-  Future<void> deleteCards(String folderId) async {
-    final file = _cards(folderId);
+  Future<void> deleteCards(String deckId) async {
+    final file = _cards(deckId);
     if (await file.exists()) await file.delete();
   }
 

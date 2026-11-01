@@ -1,12 +1,11 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/card_content.dart';
 import '../../domain/flashcard.dart';
-import '../../domain/folder.dart';
+import '../../domain/deck.dart';
 import 'library.dart';
 import 'library_files.dart';
 import 'settings.dart';
@@ -42,123 +41,91 @@ class LibraryNotifier extends Notifier<Library> {
   @override
   Library build() => ref.watch(loadedLibraryProvider);
 
-  // Folders
+  // Decks
 
-  Folder createFolder(String name, {String? parentId}) {
-    if (parentId != null) _folder(parentId);
-    final folder = Folder(id: _uuid.v4(), parentId: parentId, name: name);
-    state = state.copyWith(folders: {...state.folders, folder.id: folder});
-    return folder;
+  /// Creates a deck. [map], [submap] and [title] are required.
+  Deck createDeck({
+    required String map,
+    required String submap,
+    required String title,
+  }) {
+    final deck = Deck(id: _uuid.v4(), map: map, submap: submap, title: title);
+    _checkRequired(deck);
+    state = state.copyWith(decks: {...state.decks, deck.id: deck});
+    return deck;
   }
 
-  /// Replaces a folder's name, colour, short label or last entry choices.
-  void updateFolder(Folder folder) {
-    if (_folder(folder.id).parentId != folder.parentId) {
-      throw ArgumentError('Use moveFolder to change the parent');
-    }
-    state = state.copyWith(folders: {...state.folders, folder.id: folder});
+  /// Replaces a deck's map, submap, title or last entry choices. A new map or
+  /// submap moves the deck there.
+  void updateDeck(Deck deck) {
+    _deck(deck.id);
+    _checkRequired(deck);
+    state = state.copyWith(decks: {...state.decks, deck.id: deck});
   }
 
-  /// Moves a folder under [parentId], or to the root when it is null.
-  void moveFolder(String folderId, String? parentId) {
-    final folder = _folder(folderId);
-    if (parentId != null) {
-      _folder(parentId);
-      if (ancestry(parentId, state.folders).any((f) => f.id == folderId)) {
-        throw ArgumentError('A folder cannot move into itself');
-      }
-    }
-    state = state.copyWith(
-      folders: {...state.folders, folderId: folder.movedTo(parentId)},
-    );
-  }
-
-  /// Deletes a folder, its subfolders and all their cards, and forgets them
-  /// in the settings.
-  void deleteFolder(String folderId) {
-    _folder(folderId);
-    final doomed = {
-      for (final folder in state.folders.values)
-        if (ancestry(folder.id, state.folders).any((f) => f.id == folderId))
-          folder.id,
-    };
-    final doomedCards = {for (final id in doomed) ...state.cardsIn(id).keys};
+  /// Deletes a deck and its cards, and forgets them in the settings.
+  void deleteDeck(String deckId) {
+    _deck(deckId);
+    final doomedCards = state.cardsIn(deckId).keys.toSet();
     final settings = state.settings;
     final selection = settings.lastPrintSelection;
     final cleaned = settings.copyWith(
-      lastFolderId: doomed.contains(settings.lastFolderId)
-          ? null
-          : settings.lastFolderId,
+      lastDeckId: settings.lastDeckId == deckId ? null : settings.lastDeckId,
       lastCardId: doomedCards.contains(settings.lastCardId)
           ? null
           : settings.lastCardId,
       lastPrintSelection: selection == null
           ? null
           : PrintSelection(
-              folderIds: [
-                for (final id in selection.folderIds)
-                  if (!doomed.contains(id)) id,
+              deckIds: [
+                for (final id in selection.deckIds)
+                  if (id != deckId) id,
               ],
-              tags: selection.tags,
             ),
     );
     state = state.copyWith(
-      folders: {...state.folders}..removeWhere((id, _) => doomed.contains(id)),
-      cards: {...state.cards}..removeWhere((id, _) => doomed.contains(id)),
+      decks: {...state.decks}..remove(deckId),
+      cards: {...state.cards}..remove(deckId),
       settings: cleaned == settings ? null : cleaned,
     );
   }
 
   // Cards
 
-  Flashcard addCard(
-    String folderId,
-    CardContent content, {
-    List<String> tags = const [],
-  }) {
-    _folder(folderId);
+  Flashcard addCard(String deckId, CardContent content) {
+    _deck(deckId);
     final now = DateTime.now().toUtc();
     final card = Flashcard(
       uuid: _uuid.v4(),
-      seq: nextSeq(state.cardsIn(folderId).values),
+      seq: nextSeq(state.cardsIn(deckId).values),
       content: content,
-      tags: tags,
       createdAt: now,
       updatedAt: now,
     );
     _putCards({
-      folderId: {...state.cardsIn(folderId), card.uuid: card},
+      deckId: {...state.cardsIn(deckId), card.uuid: card},
     });
     return card;
   }
 
-  void updateCard(
-    String folderId,
-    String uuid, {
-    CardContent? content,
-    List<String>? tags,
-  }) {
-    final card = _card(folderId, uuid);
+  void updateCard(String deckId, String uuid, CardContent content) {
+    final card = _card(deckId, uuid);
     // Keep updatedAt for a commit that changes nothing, e.g. on focus loss.
-    if ((content ?? card.content) == card.content &&
-        listEquals(tags ?? card.tags, card.tags)) {
-      return;
-    }
+    if (content == card.content) return;
     final updated = card.copyWith(
       content: content,
-      tags: tags,
       updatedAt: DateTime.now().toUtc(),
     );
     _putCards({
-      folderId: {...state.cardsIn(folderId), uuid: updated},
+      deckId: {...state.cardsIn(deckId), uuid: updated},
     });
   }
 
-  void deleteCard(String folderId, String uuid) {
-    _card(folderId, uuid);
+  void deleteCard(String deckId, String uuid) {
+    _card(deckId, uuid);
     _putCards(
       {
-        folderId: {...state.cardsIn(folderId)}..remove(uuid),
+        deckId: {...state.cardsIn(deckId)}..remove(uuid),
       },
       settings: state.settings.lastCardId == uuid
           ? state.settings.copyWith(lastCardId: null)
@@ -166,12 +133,12 @@ class LibraryNotifier extends Notifier<Library> {
     );
   }
 
-  /// Moves a card to another folder, where it gets the next number (so it
+  /// Moves a card to another deck, where it gets the next number (so it
   /// counts as changed). Both card files change in one state update, so the
   /// writer saves them in one queued job.
   void moveCard(String uuid, {required String from, required String to}) {
     final card = _card(from, uuid);
-    _folder(to);
+    _deck(to);
     if (from == to) return;
     final moved = card.copyWith(
       seq: nextSeq(state.cardsIn(to).values),
@@ -189,13 +156,25 @@ class LibraryNotifier extends Notifier<Library> {
     state = state.copyWith(settings: settings);
   }
 
-  Folder _folder(String id) =>
-      state.folders[id] ??
-      (throw ArgumentError.value(id, 'folderId', 'No such folder'));
+  Deck _deck(String id) =>
+      state.decks[id] ??
+      (throw ArgumentError.value(id, 'deckId', 'No such deck'));
 
-  Flashcard _card(String folderId, String uuid) =>
-      state.cardsIn(folderId)[uuid] ??
-      (throw ArgumentError.value(uuid, 'uuid', 'No such card in $folderId'));
+  static void _checkRequired(Deck deck) {
+    for (final (name, value) in [
+      ('map', deck.map),
+      ('submap', deck.submap),
+      ('title', deck.title),
+    ]) {
+      if (value.trim().isEmpty) {
+        throw ArgumentError.value(value, name, 'Must not be blank');
+      }
+    }
+  }
+
+  Flashcard _card(String deckId, String uuid) =>
+      state.cardsIn(deckId)[uuid] ??
+      (throw ArgumentError.value(uuid, 'uuid', 'No such card in $deckId'));
 
   void _putCards(
     Map<String, Map<String, Flashcard>> changed, {

@@ -47,10 +47,6 @@ class _LibraryPlaceholder extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.libraryEmpty),
-            const SizedBox(height: 16),
-            CupertinoButton.filled(onPressed: null, child: Text(l10n.newFolder)),
-            const SizedBox(height: 16),
             CupertinoButton(
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const PrintTestScreen()),

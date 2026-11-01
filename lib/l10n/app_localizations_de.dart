@@ -13,13 +13,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appTitle => 'Karteikarten';
 
   @override
-  String get libraryEmpty =>
-      'Lege einen Ordner pro Fach an, zum Beispiel Latein.';
-
-  @override
-  String get newFolder => 'Neuer Ordner';
-
-  @override
   String get printTest => 'Drucktest';
 
   @override

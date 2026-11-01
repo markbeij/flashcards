@@ -1,5 +1,5 @@
 import '../../domain/flashcard.dart';
-import '../../domain/folder.dart';
+import '../../domain/deck.dart';
 import 'settings.dart';
 
 /// The whole library in memory. Immutable: every change makes a new
@@ -7,39 +7,38 @@ import 'settings.dart';
 /// by identity.
 class Library {
   Library({
-    Map<String, Folder> folders = const {},
+    Map<String, Deck> decks = const {},
     Map<String, Map<String, Flashcard>> cards = const {},
     Settings settings = const Settings(),
-  }) : this._(_freezeFolders(folders), _freezeCards(cards), settings);
+  }) : this._(_freezeDecks(decks), _freezeCards(cards), settings);
 
-  const Library._(this.folders, this.cards, this.settings);
+  const Library._(this.decks, this.cards, this.settings);
 
-  /// By folder id.
-  final Map<String, Folder> folders;
+  /// By deck id.
+  final Map<String, Deck> decks;
 
-  /// Folder id → card uuid → card. A folder without cards has no entry.
+  /// Deck id → card uuid → card. A deck without cards has no entry.
   /// The inner maps must be unmodifiable.
   final Map<String, Map<String, Flashcard>> cards;
 
   final Settings settings;
 
-  Map<String, Flashcard> cardsIn(String folderId) =>
-      cards[folderId] ?? const {};
+  Map<String, Flashcard> cardsIn(String deckId) => cards[deckId] ?? const {};
 
   /// Maps that are not passed keep their identity.
   Library copyWith({
-    Map<String, Folder>? folders,
+    Map<String, Deck>? decks,
     Map<String, Map<String, Flashcard>>? cards,
     Settings? settings,
   }) => Library._(
-    folders == null ? this.folders : _freezeFolders(folders),
+    decks == null ? this.decks : _freezeDecks(decks),
     cards == null ? this.cards : _freezeCards(cards),
     settings ?? this.settings,
   );
 }
 
-Map<String, Folder> _freezeFolders(Map<String, Folder> folders) =>
-    Map.unmodifiable(folders);
+Map<String, Deck> _freezeDecks(Map<String, Deck> decks) =>
+    Map.unmodifiable(decks);
 
 Map<String, Map<String, Flashcard>> _freezeCards(
   Map<String, Map<String, Flashcard>> cards,
