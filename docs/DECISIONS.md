@@ -31,6 +31,17 @@ Record decisions and spike results here, newest last. Each entry: date, decision
   - **Adaptive shell (5):** keeping state across resizes is a design rule (editing state above the layout switch) plus a widget test.
   - **Storage (6):** `getApplicationSupportDirectory()` is the documented iOS backup location, and a rename is atomic on APFS. Covered by store unit tests.
 
+## 2026-11-01: v1 simplified
+
+- **Decision:**
+  - **One card size, 95×69 mm** (the former L), 8 per A4. It fits in an A7 card box. S/M/L, size per card type and the print-time size choice are gone.
+  - **Map → submap → deck** replaces the folder tree of any depth. A deck has a required map, submap and title. Map and submap are plain text on the deck. The UI suggests "school year" and "subject" as examples; the domain knows neither. The begrip `subject` field is gone.
+  - Folder colours, short labels and tags are gone. The footer is the deck title + `#n`.
+  - The card type stays per card; a deck can mix types.
+  - **No special characters:** Latin macrons, polytonic Greek and scientific notation are out of v1, as is the macron toolbar. The on-device check that the Greek keyboard produces precomposed characters (Spike 1) is dropped.
+  - `docs/SPEC.md` (the original brief) is removed; `docs/PLAN.md` is the only spec and holds only v1.
+- **Why:** get a working first version sooner.
+
 ## Spike results
 
 - **Spike 0 (print fidelity), 2026-10-31, done.** Canon MG5700, plain copy paper (Action A4, weight not stated; likely 80 g/m²). Printed from the iPad through AirPrint (`Printing.layoutPdf`), double-sided, uncalibrated.

@@ -2,8 +2,7 @@
 
 Flutter app for iPad and iPhone that makes printed, double-sided flash cards (A4, duplex, cut with a paper cutter).
 
-- Scope and plan: [docs/PLAN.md](docs/PLAN.md)
-- Original brief: [docs/SPEC.md](docs/SPEC.md)
+- v1 spec and plan: [docs/PLAN.md](docs/PLAN.md)
 - Decisions and spike results: [docs/DECISIONS.md](docs/DECISIONS.md)
 
 ```bash

@@ -1,6 +1,6 @@
 # Flashcards app
 
-Flutter app (iPad + iPhone) for printed double-sided flash cards. Read docs/PLAN.md (v1 scope, wins on conflict) and docs/SPEC.md (original brief) first.
+Flutter app (iPad + iPhone) for printed double-sided flash cards. Read docs/PLAN.md (the v1 spec) first.
 
 ## Rules
 - Local only: no server, no accounts, no network calls.
