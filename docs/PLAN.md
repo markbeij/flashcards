@@ -13,7 +13,7 @@ A tool for making printed, double-sided flash cards for VWO students. The printe
 | Card types | All five: Vocabulary, Begrip, Paradigm, Sentence, History. The type belongs to the card; a deck can mix types |
 | Organisation | Map → submap → deck. A new deck asks for a map, a submap and a title. The domain knows nothing about school years or subjects; the UI only suggests them as examples |
 | Card size | One size for every card: 95×69 mm, so cards fit in an A7 card box. 8 cards per A4 sheet |
-| Printing | Mirrored backs, cut ticks, footer, overflow flagging, one printer calibration (back X/Y offset) with test sheet, fronts/backs fallback export |
+| Printing | Mirrored backs, cut ticks, footer, "space on the card" shown while typing (text is never shrunk), one printer calibration (back X/Y offset) with test sheet, fronts/backs fallback export |
 | Entry | Form per card (live PDF preview) + fast list entry |
 | Storage | **JSON files**, not a database (see Milestone 2 for why) |
 | Backup | iCloud device backup (files in Application Support) |
@@ -70,9 +70,9 @@ The cost is safe saving and keeping links between files consistent. Both are han
 
 - `card_size.dart`: the one card size as constants — 95×69 mm, A4, 10 mm margins, 2 columns × 4 rows.
 - `grid.dart`: pure mm geometry → card rects per page, mirrored columns for the back page, and the calibration offset applied to the back only. Unit-tested with numbers.
-- `templates/`: one `pdf` widget builder per card type and side, plus a shared card frame with the footer, such as `Woordjes H3 · #17`.
-- `sheet.dart`: builds the duplex document — uniform grid on every page, alternating front/back pages, cut ticks in the margins, no card borders, a "swap front/back" option at print time.
-- `overflow.dart`: the measurement from Spike 2. Returns the cards that don't fit; they are flagged and never shrunk.
+- `templates/`: one `pdf` widget builder per card type and side, plus a shared card frame with the footer, such as `Woordjes H3 · #17`. Each type has one fixed front: vocabulary and sentence show Dutch, begrip the term, paradigm the meaning/infinitive, history the date.
+- `sheet.dart`: builds the duplex document — uniform grid on every page, alternating front/back pages, cut ticks in the margins, no card borders.
+- `overflow.dart`: the measurement from Spike 2. Returns how full each side of a card is (content height ÷ available height) and whether a single word is too wide. It feeds the "space on the card" bar in entry. Text is never shrunk.
 - `test_sheet.dart`: the calibration test page from Spike 0.
 - Outputs: `Printing.layoutPdf` (AirPrint), sharing the full PDF, and separate `fronts.pdf`/`backs.pdf` via `Printing.sharePdf`.
 - Preview everywhere = the rasterised PDF (`PdfPreview` / `Printing.raster`). No Flutter-widget copy of card layout.
@@ -90,7 +90,7 @@ A box of cards that you print.
 ### Shell (`lib/ui/shell/adaptive_shell.dart`)
 
 The layout depends on the window size, not the device type.
-- **Two columns from 680 pt wide** (and at least 500 pt tall): Library on the left, detail on the right.
+- **Two columns from 680 pt wide** (and at least 500 pt tall): Library on the left, detail on the right. The Library column is a fixed 320 pt in both orientations (the iPadOS split-view default) and is never hidden behind a button; the detail column gets the rest.
 - **A single navigation stack below that.** iPhone is portrait-only.
 - **No tab bar.**
   - The gear (Settings) is in the navigation bar.
@@ -103,12 +103,13 @@ The layout depends on the window size, not the device type.
 ### Library
 
 - **Levels:** the Library root lists the maps. A map shows its submaps as section headers with their decks underneath. A deck shows its cards.
+- **Search:** a search field at the top of the Library filters decks across all maps by title, map and submap (case- and accent-insensitive substring). Results list the deck title with `map › submap` and the card count; tapping one opens the deck. Card content is not searched.
 - **New deck:** one sheet with three required fields:
   - map, with the hint "e.g. school year" and the existing maps as suggestions
   - submap, with the hint "e.g. subject" and the existing submaps of that map as suggestions
   - title
 - **Deck:** a "⋯" menu offers Edit (the same three fields; changing map or submap moves the deck) and Delete (with confirmation).
-- **Card row:** type icon, front text (markup removed), back text in grey, `#n`, and an overflow badge (icon + text). A "⋯" menu (also on right-click or long-press) offers Edit, New card like this, Move to…, Delete. Deleting shows an undo toast; Cmd-Backspace also deletes.
+- **Card row:** type icon, front text (markup removed), back text in grey and `#n`. A "⋯" menu (also on right-click or long-press) offers Edit, New card like this, Move to…, Delete. Deleting shows an undo toast; Cmd-Backspace also deletes.
 - **Select mode:** Move and Delete only.
 - **Empty states:** one sentence, one example, one button. For example: "Make a deck, e.g. map VWO 4, submap Latijn, title Woordjes H3" [New deck]. An empty deck shows tiles for the 5 types.
 
@@ -139,7 +140,12 @@ The layout depends on the window size, not the device type.
 - Bold/italic markup shows styled in the editor, with the markers dimmed, via a `TextEditingController.buildTextSpan` override that keeps the composing underline. The parser is the same one the PDF uses. This applies only to fields where bold/italic matters (explanation, sentence, context); vocabulary fields are plain.
 - Cmd-B/I via `Shortcuts`/`Actions`.
 
-**Overflow:** a badge plus plain words: "Doesn't fit on the card — shorten it." Never a modal dialog during entry. Overflow results are cached by content hash.
+**Space on the card:** the warning comes while typing, not at print time.
+- In the rich editor and the iPhone rapid card, a thin bar "Space on the card" sits under the fields of each side. It fills as you type, using the `overflow.dart` measurement (the real height in the PDF), not a character count.
+- The bar is blue, turns orange from 85 % full, and at 100 % (or when a single word is too wide) shows a badge plus plain words: "Doesn't fit on the card — shorten it."
+- In the vocabulary grid there is no bar; a row whose card doesn't fit shows the same badge in that row.
+- Text is never shrunk and entry is never blocked; never a modal dialog. A card that is saved too full prints as it is.
+- Measurement results are cached by content hash.
 
 **Preview rendering:** build the PDF on the main isolate first and time it on the oldest family iPad. Move PDF building (and the overflow check) to a long-lived worker isolate only if typing feels slow.
 
@@ -149,8 +155,6 @@ A full-screen route with two screens. It opens either from a deck ("Print…", w
 
 1. **Set-up page** (scrolling), with a sticky bar "48 cards · 6 sheets [Preview]":
    - **What:** the maps, submaps and decks with checkboxes; ticking a map or submap ticks its decks.
-   - **Doesn't fit:** overflowing cards appear inline with Fix / Skip; the default is Skip, and the print job is never blocked. This section is hidden when nothing overflows.
-   - **Direction**, in words: "Front shows: Dutch / Latin" ⇄.
 2. **Preview:** sheet thumbnails with a Fronts/Backs toggle.
    - A short checklist: "Double-sided, flips like a book · A4 · don't change the scale". Each item is a word plus a small illustration.
    - Then the actions:
@@ -230,6 +234,6 @@ Riskiest first, tried on the real iPad as soon as each works:
   - resize live in Split View / Stage Manager while typing (nothing may be lost)
   - test VoiceOver on the grid
   - check the UI in German, the longest language
-- Widget tests: grid focus order (Return/Tab, new row), a layout switch at 680 pt keeps selection and draft, the overflow badge appears.
+- Widget tests: grid focus order (Return/Tab, new row), a layout switch at 680 pt keeps selection and draft, the space bar turns orange at 85 % and shows the badge when full.
 - Physical: print the test sheet and a full sheet of cards on the real printer, cut with the paper cutter, check that front/back alignment after calibration is within ~1 mm, and that the cards fit the A7 box.
 - Install the TestFlight build on a family device; enter, print, then reinstall from backup to confirm the data survives.
