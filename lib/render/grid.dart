@@ -34,9 +34,18 @@ class MmRect {
 /// Card positions on a sheet. The grid is centred on the page.
 ///
 /// The back is printed flipping on the long edge, so a card's back sits in the
-/// mirrored column of the same row.
+/// mirrored column of the same row. The printer calibration ([backDxMm],
+/// [backDyMm], in back-page coordinates: x to the right, y downwards) moves
+/// everything on the back page and nothing on the front.
 class SheetGrid {
-  const SheetGrid();
+  const SheetGrid({this.backDxMm = 0, this.backDyMm = 0});
+
+  final double backDxMm;
+  final double backDyMm;
+
+  /// The calibration offset for [side].
+  double dx(Side side) => side == Side.back ? backDxMm : 0;
+  double dy(Side side) => side == Side.back ? backDyMm : 0;
 
   double get left => (pageWidthMm - sheetColumns * cardWidthMm) / 2;
   double get top => (pageHeightMm - sheetRows * cardHeightMm) / 2;
@@ -51,21 +60,22 @@ class SheetGrid {
     final row = index ~/ sheetColumns;
     if (side == Side.back) column = sheetColumns - 1 - column;
     return MmRect(
-      left + column * cardWidthMm,
-      top + row * cardHeightMm,
+      left + column * cardWidthMm + dx(side),
+      top + row * cardHeightMm + dy(side),
       cardWidthMm,
       cardHeightMm,
     );
   }
 
-  /// X positions of all vertical cut lines (identical on front and back).
-  List<double> get columnEdges => [
-    for (var c = 0; c <= sheetColumns; c++) left + c * cardWidthMm,
+  /// X positions of all vertical cut lines on [side]. Without calibration
+  /// they are the same on front and back.
+  List<double> columnEdges([Side side = Side.front]) => [
+    for (var c = 0; c <= sheetColumns; c++) left + c * cardWidthMm + dx(side),
   ];
 
-  /// Y positions of all horizontal cut lines.
-  List<double> get rowEdges => [
-    for (var r = 0; r <= sheetRows; r++) top + r * cardHeightMm,
+  /// Y positions of all horizontal cut lines on [side].
+  List<double> rowEdges([Side side = Side.front]) => [
+    for (var r = 0; r <= sheetRows; r++) top + r * cardHeightMm + dy(side),
   ];
 }
 

@@ -37,7 +37,26 @@ void main() {
   });
 
   test('cut lines', () {
-    expect(grid.columnEdges, [10, 105, 200]);
-    expect(grid.rowEdges, [10.5, 79.5, 148.5, 217.5, 286.5]);
+    expect(grid.columnEdges(), [10, 105, 200]);
+    expect(grid.rowEdges(), [10.5, 79.5, 148.5, 217.5, 286.5]);
+    expect(grid.columnEdges(Side.back), grid.columnEdges());
+  });
+
+  group('calibration', () {
+    const calibrated = SheetGrid(backDxMm: -0.5, backDyMm: 1);
+
+    test('moves the back only', () {
+      for (var i = 0; i < cardsPerSheet; i++) {
+        expect(calibrated.cell(i, Side.front), grid.cell(i, Side.front));
+      }
+      expect(calibrated.cell(0, Side.back), const MmRect(104.5, 11.5, 95, 69));
+      expect(calibrated.cell(7, Side.back), const MmRect(9.5, 218.5, 95, 69));
+    });
+
+    test('moves the back cut ticks with the cards', () {
+      expect(calibrated.columnEdges(), [10, 105, 200]);
+      expect(calibrated.columnEdges(Side.back), [9.5, 104.5, 199.5]);
+      expect(calibrated.rowEdges(Side.back), [11.5, 80.5, 149.5, 218.5, 287.5]);
+    });
   });
 }

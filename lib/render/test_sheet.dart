@@ -5,6 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 import 'card_size.dart';
 import 'grid.dart';
+import 'sheet.dart';
 
 const _mm = PdfPageFormat.mm;
 const _hairline = 0.25;
@@ -167,15 +168,7 @@ void _paint(PdfGraphics canvas, SheetGrid grid, Side side) {
 
   canvas.setStrokeColor(PdfColors.black);
 
-  // Cut ticks in the margins, 1 mm away from the grid, 5 mm long.
-  for (final x in grid.columnEdges) {
-    line(x, grid.top - 1, x, grid.top - 6);
-    line(x, grid.bottom + 1, x, grid.bottom + 6);
-  }
-  for (final y in grid.rowEdges) {
-    line(grid.left - 1, y, grid.left - 6, y);
-    line(grid.right + 1, y, grid.right + 6, y);
-  }
+  paintCutTicks(canvas, grid, Side.front);
 
   // Horizontal ruler, 190 mm, ticks downwards.
   final ry = _rulerY(grid);
