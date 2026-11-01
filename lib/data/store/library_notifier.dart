@@ -133,6 +133,18 @@ class LibraryNotifier extends Notifier<Library> {
     );
   }
 
+  /// Puts deleted cards back as they were, with their numbers (undo of a
+  /// delete). Cards whose deck is gone are dropped.
+  void restoreCards(String deckId, Iterable<Flashcard> cards) {
+    if (!state.decks.containsKey(deckId)) return;
+    _putCards({
+      deckId: {
+        ...state.cardsIn(deckId),
+        for (final card in cards) card.uuid: card,
+      },
+    });
+  }
+
   /// Moves a card to another deck, where it gets the next number (so it
   /// counts as changed). Both card files change in one state update, so the
   /// writer saves them in one queued job.

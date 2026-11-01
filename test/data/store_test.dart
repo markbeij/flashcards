@@ -348,6 +348,25 @@ void main() {
       expect(reloaded.cardsIn(b.id).keys, [card.uuid]);
     });
 
+    test('undo of a delete restores the card with its number', () async {
+      final (notifier, writer, container) = await open();
+      final h1 = deck(notifier, 'A');
+      final cards = [
+        for (var i = 0; i < 3; i++) notifier.addCard(h1.id, _word),
+      ];
+      notifier.deleteCard(h1.id, cards[1].uuid);
+      await writer.flush();
+
+      notifier.restoreCards(h1.id, [cards[1]]);
+      await writer.flush();
+
+      expect(
+        container.read(libraryProvider).cardsIn(h1.id)[cards[1].uuid],
+        cards[1],
+      );
+      expect(seqsOnDisk(h1.id), [1, 2, 3]);
+    });
+
     test('deleting the last opened card forgets it', () async {
       final (notifier, _, container) = await open();
       final h1 = deck(notifier, 'A');
