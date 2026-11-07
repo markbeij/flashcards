@@ -42,9 +42,31 @@ Record decisions and spike results here, newest last. Each entry: date, decision
   - `docs/SPEC.md` (the original brief) is removed; `docs/PLAN.md` is the only spec and holds only v1.
 - **Why:** get a working first version sooner.
 
+## 2026-11-01: No print direction
+
+- **Decision:** the print set-up has no "Front shows: Dutch / Latin ⇄" choice. Each card type has one fixed front (vocabulary and sentence: Dutch; begrip: the term; paradigm: the meaning/infinitive; history: the date).
+- **Why:**
+  - A printed card has two sides, so you practise the other direction by turning the card or the stack over.
+  - For begrip, paradigm and history, swapping would put the long text on the front.
+  - A deck can mix types, so a language swap doesn't apply to every card in it.
+
+## 2026-11-01: Overflow is shown while typing, not at print time
+
+- **Decision:**
+  - Entry shows a "Space on the card" bar per side. It is driven by the `overflow.dart` measurement, turns orange from 85 % and shows the "Doesn't fit" badge when full.
+  - Text is never shrunk and entry is never blocked.
+  - There is no overflow badge in the card list, and no "Doesn't fit" section in the print set-up.
+- **Why:**
+  - Shrinking text makes it hard to read and gives a stack mixed text sizes; a minimum size would still need a warning.
+  - A character limit is a poor proxy for the real width, and a hard stop is frustrating.
+  - Warning at print time is too late. Without the badge in the list and the print section, v1 needs less UI.
+- **Cost accepted:** a card that is saved too full prints as it is.
+
 ## 2026-11-01: Card layout, entry engine and print details (Milestones 3–4)
 
 Choices made while building where the plan left room. Revisit any of them after the first printed sheet or the first session on the iPad.
+
+This was built from the spec before the two decisions above were merged into main. Where they differ (the print-time ⇄, the history card's front, overflow shown at print time), the decisions above apply and the code still has to follow.
 
 - **What each side shows** (`lib/render/templates/`). Front → back:
   - vocabulary: Dutch word (+ "mv." plural) → target word with article, then Latin "genitive gender." (as on the test sheet: *puellae f.*), German plural with "die", French gender only when the article doesn't show it (*l'élève m.*), "pl." for the others;
