@@ -27,7 +27,10 @@ class LibraryRootPage extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: MapsList(onOpenMap: (map) => context.go(mapLocation(map))),
+              child: MapsList(
+                onOpenMap: (map) => context.go(mapLocation(map)),
+                onOpenDeck: (deck) => context.go(deckLocation(deck)),
+              ),
             ),
             const LibraryToolbar(),
           ],
@@ -102,7 +105,10 @@ class LibraryColumn extends StatelessWidget {
           children: [
             Expanded(
               child: map == null
-                  ? MapsList(onOpenMap: (map) => context.go(mapLocation(map)))
+                  ? MapsList(
+                      onOpenMap: (map) => context.go(mapLocation(map)),
+                      onOpenDeck: (deck) => context.go(deckLocation(deck)),
+                    )
                   : MapContents(
                       map: map,
                       selectedDeckId: deckId,

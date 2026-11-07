@@ -8,14 +8,12 @@ import '../../domain/flashcard.dart';
 import '../../l10n/app_localizations.dart';
 import '../common/card_summary.dart';
 import '../common/card_type_labels.dart';
-import '../common/overflow_badge.dart';
-import '../providers.dart';
 
 /// What the row's menu can do.
 enum CardAction { edit, newLikeThis, move, delete }
 
-/// A card in a deck: type icon, front text, back text in grey, `#n` and an
-/// overflow badge. The "⋯" menu also opens on right-click or long-press.
+/// A card in a deck: type icon, front text, back text in grey and `#n`. The
+/// "⋯" menu also opens on right-click or long-press.
 class CardRow extends ConsumerStatefulWidget {
   const CardRow({
     super.key,
@@ -51,8 +49,6 @@ class _CardRowState extends ConsumerState<CardRow> {
     final l10n = AppLocalizations.of(context);
     final card = widget.card;
     final summary = cardSummary(card.content);
-    final overflow =
-        ref.watch(overflowCheckerProvider)?.overflows(card.content) ?? false;
     final secondary = CupertinoColors.secondaryLabel.resolveFrom(context);
     final background = widget.selected
         ? CupertinoColors.systemFill.resolveFrom(context)
@@ -125,10 +121,6 @@ class _CardRowState extends ConsumerState<CardRow> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      if (overflow) ...[
-                        const SizedBox(height: 4),
-                        const OverflowBadge(),
-                      ],
                     ],
                   ),
                 ),

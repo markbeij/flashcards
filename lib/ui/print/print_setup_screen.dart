@@ -3,18 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/store/library_notifier.dart';
-import '../../domain/card_content.dart';
 import '../../domain/deck.dart';
 import '../../l10n/app_localizations.dart';
 import '../../render/sheet.dart';
-import '../common/card_summary.dart';
-import '../common/card_type_labels.dart';
 import '../locations.dart';
 import 'print_job.dart';
 
-/// Print, step 1: what to print, the cards that don't fit, and the
-/// direction. Opens from a deck (that deck ticked) or from the Library (the
-/// last selection).
+/// Print, step 1: what to print. Opens from a deck (that deck ticked) or
+/// from the Library (the last selection).
 class PrintSetupScreen extends ConsumerStatefulWidget {
   const PrintSetupScreen({super.key, this.deckId});
 
@@ -36,9 +32,7 @@ class _PrintSetupScreenState extends ConsumerState<PrintSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final job = ref.watch(printJobProvider);
-    final plan = ref.watch(printPlanProvider);
-    final printed = plan.printed(job);
+    final printed = ref.watch(printCardsProvider);
     final secondary = CupertinoColors.secondaryLabel.resolveFrom(context);
 
     return CupertinoPageScaffold(
@@ -58,15 +52,7 @@ class _PrintSetupScreenState extends ConsumerState<PrintSetupScreen> {
           children: [
             Expanded(
               child: ListView(
-                children: [
-                  const _WhatSection(),
-                  if (plan.overflowing.isNotEmpty) _OverflowSection(plan: plan),
-                  CupertinoListSection.insetGrouped(
-                    header: Text(l10n.printDirection),
-                    children: [_DirectionTile(plan: plan, swap: job.swap)],
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                children: [const _WhatSection(), const SizedBox(height: 24)],
               ),
             ),
             // The sticky bar.
@@ -192,95 +178,6 @@ class _WhatSection extends ConsumerWidget {
           ],
         ],
       ],
-    );
-  }
-}
-
-/// Cards that don't fit: Fix opens the card, Skip (the default) leaves it
-/// out. Printing is never blocked.
-class _OverflowSection extends ConsumerWidget {
-  const _OverflowSection({required this.plan});
-
-  final PrintPlan plan;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final job = ref.watch(printJobProvider);
-    final library = ref.watch(libraryProvider);
-    return CupertinoListSection.insetGrouped(
-      header: Text(l10n.printDoesntFit),
-      footer: Text(l10n.printDoesntFitHint),
-      children: [
-        for (final c in plan.cards)
-          if (plan.overflowing.contains(c.card.uuid))
-            CupertinoListTile(
-              leading: Icon(c.card.type.icon),
-              title: Text(cardSummary(c.card.content).front),
-              subtitle: Text('${c.deckTitle} · #${c.card.seq}'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CupertinoButton(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    onPressed: () {
-                      final deckId = library.cards.entries
-                          .firstWhere((e) => e.value.containsKey(c.card.uuid))
-                          .key;
-                      context.push(cardLocation(deckId, c.card.uuid));
-                    },
-                    child: Text(l10n.fix),
-                  ),
-                  Text(l10n.skip),
-                  const SizedBox(width: 6),
-                  CupertinoSwitch(
-                    value: !job.printAnyway.contains(c.card.uuid),
-                    onChanged: (skip) => ref
-                        .read(printJobProvider.notifier)
-                        .setSkip(c.card.uuid, skip: skip),
-                  ),
-                ],
-              ),
-            ),
-      ],
-    );
-  }
-}
-
-/// "Front shows: Dutch / Back shows: Latin" with ⇄.
-class _DirectionTile extends ConsumerWidget {
-  const _DirectionTile({required this.plan, required this.swap});
-
-  final PrintPlan plan;
-  final bool swap;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final languages = plan.languages;
-    final (question, answer) = languages.isEmpty
-        ? (l10n.directionQuestion, l10n.directionAnswer)
-        : (
-            l10n.languageDutch,
-            [
-              for (final language in VocabLanguage.values)
-                if (languages.contains(language)) language.label(l10n),
-            ].join(', '),
-          );
-    final (front, back) = swap ? (answer, question) : (question, answer);
-    return CupertinoListTile(
-      title: Text(l10n.frontShows(front)),
-      subtitle: Text(l10n.backShows(back)),
-      trailing: CupertinoButton(
-        padding: EdgeInsets.zero,
-        minimumSize: const Size(44, 44),
-        onPressed: () => ref.read(printJobProvider.notifier).toggleSwap(),
-        child: Icon(
-          CupertinoIcons.arrow_right_arrow_left,
-          semanticLabel: l10n.swapSides,
-        ),
-      ),
-      onTap: () => ref.read(printJobProvider.notifier).toggleSwap(),
     );
   }
 }

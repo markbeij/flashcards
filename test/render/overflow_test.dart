@@ -19,6 +19,36 @@ void main() {
     }
   });
 
+  test('a side fills as text is added, and is full when it is too tall', () {
+    CardFill fill(String explanation) =>
+        checker.measure(BegripContent(term: 'Term', explanation: explanation));
+    final short = fill('Kort.');
+    final medium = fill(List.filled(12, 'een lange uitleg').join(' '));
+    final long = fill(List.filled(60, 'een lange uitleg').join(' '));
+
+    // The front holds only the term, so it stays the same.
+    expect(medium.front.fill, short.front.fill);
+    expect(short.back.fill, inExclusiveRange(0, medium.back.fill));
+    expect(medium.back.fill, lessThan(1));
+    expect(medium.full, isFalse);
+    expect(long.back.fill, greaterThan(1));
+    expect(long.back.full, isTrue);
+    expect(long.front.full, isFalse);
+  });
+
+  test('a word that is too wide fills the side even when it is short', () {
+    final fill = checker.measure(
+      const BegripContent(
+        term: 'Donaudampfschifffahrtsgesellschaftskapitänsmützenabzeichen',
+        explanation: 'Kort.',
+      ),
+    );
+    expect(fill.front.wordTooWide, isTrue);
+    expect(fill.front.fill, lessThan(1));
+    expect(fill.front.full, isTrue);
+    expect(fill.back.full, isFalse);
+  });
+
   test('a long explanation overflows', () {
     final long = List.filled(
       40,

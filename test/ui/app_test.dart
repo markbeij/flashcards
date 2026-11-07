@@ -4,7 +4,11 @@ import 'package:flashcards/data/store/settings.dart';
 import 'package:flashcards/domain/card_content.dart';
 import 'package:flashcards/domain/deck.dart';
 import 'package:flashcards/domain/flashcard.dart';
+import 'package:flashcards/l10n/app_localizations.dart';
+import 'package:flashcards/render/overflow.dart';
+import 'package:flashcards/ui/entry/space_bar.dart';
 import 'package:flashcards/ui/library/card_row.dart';
+import 'package:flashcards/ui/library/library_pages.dart';
 import 'package:flashcards/ui/providers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -88,9 +92,7 @@ void main() {
     expect(find.text('#1'), findsOneWidget);
   });
 
-  testWidgets('a card that does not fit shows the overflow badge', (
-    tester,
-  ) async {
+  testWidgets('the card list has no overflow badge', (tester) async {
     final long = List.filled(60, 'een lange uitleg').join(' ');
     await pumpApp(
       tester,
@@ -101,7 +103,198 @@ void main() {
         ],
       ),
     );
-    expect(find.text('Past niet'), findsOneWidget);
+    expect(find.text('Verlichting'), findsOneWidget);
+    expect(find.textContaining('Past niet'), findsNothing);
+  });
+
+  group('space on the card', () {
+    testWidgets('the editor shows a bar per side and the badge when full', (
+      tester,
+    ) async {
+      final long = List.filled(60, 'een lange uitleg').join(' ');
+      await pumpApp(
+        tester,
+        library: _library(
+          cards: [
+            _card(1, const BegripContent(term: 'a', explanation: 'b')),
+            _card(2, BegripContent(term: 'Verlichting', explanation: long)),
+          ],
+        ),
+      );
+      await tester.tap(find.text('a'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ruimte op de kaart'), findsNWidgets(2));
+      expect(find.textContaining('Past niet'), findsNothing);
+
+      await tester.tap(find.text('Klaar'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Verlichting'));
+      await tester.pumpAndSettle();
+      // Only the back is too full.
+      expect(find.text('Ruimte op de kaart'), findsNWidgets(2));
+      expect(find.textContaining('Past niet'), findsOneWidget);
+    });
+
+    testWidgets('typing fills the bar; entry is never blocked', (tester) async {
+      await pumpApp(tester, library: _library());
+      await tester.tap(find.text('Begrip'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Past niet'), findsNothing);
+
+      final long = List.filled(60, 'een lange uitleg').join(' ');
+      await tester.enterText(field('Nieuwe kaart, Uitleg'), long);
+      await tester.pump();
+      expect(find.textContaining('Past niet'), findsOneWidget);
+      expect(
+        tester
+            .widget<EditableText>(field('Nieuwe kaart, Uitleg'))
+            .controller
+            .text,
+        long,
+      );
+    });
+
+    Future<void> pumpBar(WidgetTester tester, SideFill? fill) =>
+        tester.pumpWidget(
+          CupertinoApp(
+            locale: const Locale('nl'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Center(child: SpaceBarView(fill: fill)),
+          ),
+        );
+
+    int? barColor(WidgetTester tester) => tester
+        .widgetList<Container>(find.byType(Container))
+        .map((c) => c.color)
+        .whereType<Color>()
+        .last
+        .toARGB32();
+
+    testWidgets('blue below 85 %, orange from 85 %, badge when full', (
+      tester,
+    ) async {
+      await pumpBar(tester, const SideFill(fill: 0.5, wordTooWide: false));
+      expect(barColor(tester), CupertinoColors.systemBlue.color.toARGB32());
+      expect(find.textContaining('Past niet'), findsNothing);
+
+      await pumpBar(tester, const SideFill(fill: 0.85, wordTooWide: false));
+      expect(barColor(tester), CupertinoColors.systemOrange.color.toARGB32());
+      expect(find.textContaining('Past niet'), findsNothing);
+
+      await pumpBar(tester, const SideFill(fill: 1.2, wordTooWide: false));
+      expect(barColor(tester), CupertinoColors.systemOrange.color.toARGB32());
+      expect(find.textContaining('Past niet'), findsOneWidget);
+
+      // A single word that is too wide, in a side with room to spare.
+      await pumpBar(tester, const SideFill(fill: 0.2, wordTooWide: true));
+      expect(find.textContaining('Past niet'), findsOneWidget);
+    });
+  });
+
+  group('library search', () {
+    Library library() => Library(
+      decks: const {
+        'd1': _deck,
+        'd2': Deck(
+          id: 'd2',
+          map: 'VWO 5',
+          submap: 'Frans',
+          title: 'Café',
+          lastCardType: CardType.vocabulary,
+          lastLanguage: VocabLanguage.french,
+        ),
+      },
+      cards: {
+        'd1': {'c1': _card(1, _puella)},
+      },
+    );
+
+    testWidgets('filters decks by title, map and submap', (tester) async {
+      await pumpApp(tester, library: library());
+      expect(find.text('VWO 4'), findsOneWidget);
+      final search = find.byType(CupertinoSearchTextField);
+
+      await tester.enterText(search, 'cafe');
+      await tester.pumpAndSettle();
+      expect(find.text('Café'), findsOneWidget);
+      expect(find.text('VWO 5 › Frans'), findsOneWidget);
+      expect(find.text('Woordjes H3'), findsNothing);
+      // The maps are replaced by the results.
+      expect(find.text('VWO 4'), findsNothing);
+
+      await tester.enterText(search, 'LATIJN');
+      await tester.pumpAndSettle();
+      expect(find.text('Woordjes H3'), findsOneWidget);
+      expect(find.text('VWO 4 › Latijn'), findsOneWidget);
+      expect(find.text('1 kaart'), findsOneWidget);
+
+      await tester.enterText(search, 'vwo 5');
+      await tester.pumpAndSettle();
+      expect(find.text('Café'), findsOneWidget);
+
+      await tester.enterText(search, 'grieks');
+      await tester.pumpAndSettle();
+      expect(find.text('Geen stapels gevonden'), findsOneWidget);
+
+      await tester.enterText(search, '');
+      await tester.pumpAndSettle();
+      expect(find.text('VWO 4'), findsOneWidget);
+    });
+
+    testWidgets('tapping a result opens the deck', (tester) async {
+      await pumpApp(tester, library: library(), size: narrow);
+      await tester.enterText(find.byType(CupertinoSearchTextField), 'woordjes');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Woordjes H3'));
+      await tester.pumpAndSettle();
+      expect(find.text('Kaarten toevoegen'), findsOneWidget);
+    });
+
+    testWidgets('card content is not searched', (tester) async {
+      await pumpApp(tester, library: library());
+      await tester.enterText(find.byType(CupertinoSearchTextField), 'puella');
+      await tester.pumpAndSettle();
+      expect(find.text('Geen stapels gevonden'), findsOneWidget);
+    });
+  });
+
+  group('shell', () {
+    testWidgets('the Library column is 320 pt in both orientations', (
+      tester,
+    ) async {
+      await pumpApp(tester, library: _library(open: false));
+      expect(tester.getSize(find.byType(LibraryColumn)).width, 320);
+
+      setSize(tester, const Size(768, 1024));
+      await tester.pumpAndSettle();
+      expect(tester.getSize(find.byType(LibraryColumn)).width, 320);
+    });
+  });
+
+  group('print set-up', () {
+    testWidgets('has no direction choice and no "Doesn\'t fit" section', (
+      tester,
+    ) async {
+      final long = List.filled(60, 'een lange uitleg').join(' ');
+      await pumpApp(
+        tester,
+        library: _library(
+          cards: [
+            _card(1, _puella),
+            _card(2, BegripContent(term: 'Verlichting', explanation: long)),
+          ],
+        ),
+      );
+      await tester.tap(find.text('Printen…'));
+      await tester.pumpAndSettle();
+      // The deck is ticked and every card counts, the full one too.
+      expect(find.text('2 kaarten · 1 vel'), findsOneWidget);
+      expect(find.text('Richting'), findsNothing);
+      expect(find.textContaining('Voorkant:'), findsNothing);
+      expect(find.text('Overslaan'), findsNothing);
+      expect(find.textContaining('Past niet'), findsNothing);
+    });
   });
 
   testWidgets('deleting a card can be undone', (tester) async {

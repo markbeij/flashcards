@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../domain/card_content.dart';
+import '../../render/grid.dart' show Side;
 import 'markup_controller.dart';
 
 /// A field of a card in the entry screens. The names match the JSON keys,
@@ -30,6 +31,12 @@ enum DraftField {
   };
 
   static DraftField? byName(String name) => values.asNameMap()[name];
+
+  /// The side of the card the field is printed on.
+  Side get side => switch (this) {
+    nlSingular || nlPlural || term || heading || nl || date => Side.front,
+    _ => Side.back,
+  };
 }
 
 /// The vocabulary grid's columns for a language.
@@ -102,8 +109,8 @@ List<DraftField> formFields(CardType type, VocabLanguage language) =>
         DraftField.grammarPoint,
       ],
       CardType.history => const [
-        DraftField.event,
         DraftField.date,
+        DraftField.event,
         DraftField.context,
       ],
     };

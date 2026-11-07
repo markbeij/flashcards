@@ -4,10 +4,7 @@ import '../../l10n/app_localizations.dart';
 
 /// Icon and plain words: the card's content doesn't fit.
 class OverflowBadge extends StatelessWidget {
-  const OverflowBadge({super.key, this.long = false});
-
-  /// With the advice to shorten it, for the entry screens.
-  final bool long;
+  const OverflowBadge({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +21,7 @@ class OverflowBadge extends StatelessWidget {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            long ? l10n.overflowLong : l10n.overflowShort,
+            l10n.overflowLong,
             style: TextStyle(color: color, fontSize: 14),
           ),
         ),

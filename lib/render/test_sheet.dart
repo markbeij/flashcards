@@ -53,26 +53,50 @@ Future<Uint8List> buildTestSheet(
                 bold: true,
               ),
             for (var mm = 0; mm <= 190; mm += 10)
-              _text('$mm', left: grid.left + mm, top: _rulerY(grid) + 4.5, fontSize: 5, centered: true),
+              _text(
+                '$mm',
+                left: grid.left + mm,
+                top: _rulerY(grid) + 4.5,
+                fontSize: 5,
+                centered: true,
+              ),
             for (var mm = 10; mm <= 270; mm += 10)
-              _text('$mm', left: pageWidthMm / 2 - 9, top: _vRulerTop(grid) + mm - 1.2, fontSize: 5),
+              _text(
+                '$mm',
+                left: pageWidthMm / 2 - 9,
+                top: _vRulerTop(grid) + mm - 1.2,
+                fontSize: 5,
+              ),
             if (side == Side.back)
               for (var target = 0; target < _targets.length; target++)
                 // Labels sit in separate quadrants so they never overlap
                 // (see _offsetScale).
                 for (final d in const [-4, -2, 2, 4]) ...[
-                  _text(_signed(d),
-                      left: _targetPoint(grid, target, side).$1 + d,
-                      top: _targetPoint(grid, target, side).$2 + (d < 0 ? 2.4 : -4.0),
-                      fontSize: 4.5,
-                      centered: true),
-                  _text(_signed(d),
-                      left: _targetPoint(grid, target, side).$1 + (d < 0 ? -5.0 : 2.6),
-                      top: _targetPoint(grid, target, side).$2 + d - 0.9,
-                      fontSize: 4.5),
+                  _text(
+                    _signed(d),
+                    left: _targetPoint(grid, target, side).$1 + d,
+                    top:
+                        _targetPoint(grid, target, side).$2 +
+                        (d < 0 ? 2.4 : -4.0),
+                    fontSize: 4.5,
+                    centered: true,
+                  ),
+                  _text(
+                    _signed(d),
+                    left:
+                        _targetPoint(grid, target, side).$1 +
+                        (d < 0 ? -5.0 : 2.6),
+                    top: _targetPoint(grid, target, side).$2 + d - 0.9,
+                    fontSize: 4.5,
+                  ),
                 ],
             for (final (offset, (front, back)) in _sampleCards.indexed)
-              _sampleCard(grid, _firstSampleIndex + offset, side, side == Side.front ? front : back),
+              _sampleCard(
+                grid,
+                _firstSampleIndex + offset,
+                side,
+                side == Side.front ? front : back,
+              ),
           ],
         ),
       ),
@@ -94,7 +118,8 @@ String _signed(int value) => value > 0 ? '+$value' : '−${-value}';
 }
 
 double _rulerY(SheetGrid grid) => grid.cell(2, Side.front).centerY;
-double _vRulerTop(SheetGrid grid) => grid.top + (grid.bottom - grid.top - 270) / 2;
+double _vRulerTop(SheetGrid grid) =>
+    grid.top + (grid.bottom - grid.top - 270) / 2;
 
 /// The cards of the first row hold only targets A and B.
 const _firstSampleIndex = 2;
@@ -107,7 +132,12 @@ const _sampleCards = [
   (('liefhebben', 'werkwoord'), ('amō', 'amāre, amāvī, amātum')),
 ];
 
-pw.Widget _sampleCard(SheetGrid grid, int index, Side side, (String, String) text) {
+pw.Widget _sampleCard(
+  SheetGrid grid,
+  int index,
+  Side side,
+  (String, String) text,
+) {
   final cell = grid.cell(index, side);
   return pw.Positioned(
     left: cell.left * _mm,
@@ -115,11 +145,19 @@ pw.Widget _sampleCard(SheetGrid grid, int index, Side side, (String, String) tex
     child: pw.Container(
       width: cell.width * _mm,
       height: cell.height * _mm,
-      padding: const pw.EdgeInsets.fromLTRB(4 * _mm, 4 * _mm, 7 * _mm, 2.5 * _mm),
+      padding: const pw.EdgeInsets.fromLTRB(
+        4 * _mm,
+        4 * _mm,
+        7 * _mm,
+        2.5 * _mm,
+      ),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text(text.$1, style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+          pw.Text(
+            text.$1,
+            style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold),
+          ),
           pw.SizedBox(height: 1 * _mm),
           pw.Text(text.$2, style: const pw.TextStyle(fontSize: 10)),
           pw.Spacer(),
@@ -147,7 +185,10 @@ pw.Widget _text(
   final label = pw.Text(
     text,
     textAlign: centered ? pw.TextAlign.center : null,
-    style: pw.TextStyle(fontSize: fontSize, fontWeight: bold ? pw.FontWeight.bold : null),
+    style: pw.TextStyle(
+      fontSize: fontSize,
+      fontWeight: bold ? pw.FontWeight.bold : null,
+    ),
   );
   return pw.Positioned(
     left: (centered ? left - centerBox / 2 : left) * _mm,
@@ -158,7 +199,13 @@ pw.Widget _text(
 
 /// Draws all lines. Coordinates are page millimetres from the top-left.
 void _paint(PdfGraphics canvas, SheetGrid grid, Side side) {
-  void line(double x1, double y1, double x2, double y2, [double width = _hairline]) {
+  void line(
+    double x1,
+    double y1,
+    double x2,
+    double y2, [
+    double width = _hairline,
+  ]) {
     canvas
       ..setLineWidth(width)
       ..moveTo(x1 * _mm, (pageHeightMm - y1) * _mm)
@@ -197,7 +244,13 @@ void _paint(PdfGraphics canvas, SheetGrid grid, Side side) {
 
 double _tickLength(int mm) => mm % 10 == 0 ? 4 : (mm % 5 == 0 ? 2.5 : 1.5);
 
-typedef _Line = void Function(double x1, double y1, double x2, double y2, [double width]);
+typedef _Line = void Function(
+  double x1,
+  double y1,
+  double x2,
+  double y2, [
+  double width,
+]);
 
 void _crosshair(_Line line, PdfGraphics canvas, double x, double y) {
   line(x - 7, y, x + 7, y, 0.35);

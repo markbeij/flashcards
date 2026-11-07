@@ -46,14 +46,10 @@ class CardFace {
   final List<Block> blocks;
 }
 
-/// Both sides of a card, before the print direction is applied.
+/// Both sides of a card. Each card type has one fixed front.
 class CardFaces {
   const CardFaces(this.front, this.back);
 
   final CardFace front;
   final CardFace back;
-
-  /// With [swap], the back becomes the front.
-  CardFaces oriented({required bool swap}) =>
-      swap ? CardFaces(back, front) : this;
 }

@@ -249,6 +249,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get overflowLong => 'Ne tient pas sur la carte — raccourcissez.';
 
   @override
+  String get spaceOnCard => 'Place sur la carte';
+
+  @override
+  String spaceUsed(int percent) {
+    return '$percent % plein';
+  }
+
+  @override
+  String get searchDecks => 'Rechercher un paquet';
+
+  @override
+  String get searchNoResults => 'Aucun paquet trouvé';
+
+  @override
   String get bold => 'Gras';
 
   @override
@@ -416,41 +430,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get printNothing => 'Il n\'y a pas encore de paquets.';
-
-  @override
-  String get printDoesntFit => 'Ne tient pas';
-
-  @override
-  String get printDoesntFitHint =>
-      'Ces cartes sont ignorées, sauf si vous désactivez Ignorer.';
-
-  @override
-  String get fix => 'Corriger';
-
-  @override
-  String get skip => 'Ignorer';
-
-  @override
-  String get printDirection => 'Sens';
-
-  @override
-  String frontShows(String side) {
-    return 'Recto : $side';
-  }
-
-  @override
-  String backShows(String side) {
-    return 'Verso : $side';
-  }
-
-  @override
-  String get directionQuestion => 'question';
-
-  @override
-  String get directionAnswer => 'réponse';
-
-  @override
-  String get swapSides => 'Inverser recto et verso';
 
   @override
   String get fronts => 'Rectos';

@@ -5,7 +5,9 @@ import '../library/library_pages.dart';
 /// Two columns from this width (and [twoColumnMinHeight] tall).
 const twoColumnMinWidth = 680.0;
 const twoColumnMinHeight = 500.0;
-const libraryColumnWidth = 340.0;
+
+/// The iPadOS split-view default, in both orientations.
+const libraryColumnWidth = 320.0;
 
 bool isTwoColumn(Size size) =>
     size.width >= twoColumnMinWidth && size.height >= twoColumnMinHeight;

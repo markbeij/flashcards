@@ -149,8 +149,11 @@ class EntrySession extends ChangeNotifier {
   /// Return or Tab in [field] of [row]: the next field, or at the last
   /// field, save the row and start a new one. Focus moves synchronously, to
   /// a field that is already on screen, so the keyboard stays up.
-  void next(DraftCard row, DraftField field) {
-    final order = gridOrder(row);
+  ///
+  /// [order] is the fields in the order they are shown, when that differs
+  /// from the grid's.
+  void next(DraftCard row, DraftField field, {List<DraftField>? order}) {
+    order ??= gridOrder(row);
     final i = order.indexOf(field);
     if (i >= 0 && i < order.length - 1) {
       row.focus(order[i + 1]).requestFocus();

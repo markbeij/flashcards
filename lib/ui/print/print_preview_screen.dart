@@ -35,14 +35,12 @@ class _PrintPreviewScreenState extends ConsumerState<PrintPreviewScreen> {
   Future<Uint8List> _build(SheetPages pages) async {
     final title = AppLocalizations.of(context).appTitle;
     final theme = await ref.read(cardThemeProvider.future);
-    final job = ref.read(printJobProvider);
     final settings = ref.read(libraryProvider).settings;
     return buildSheets(
-      ref.read(printPlanProvider).printed(job),
+      ref.read(printCardsProvider),
       theme: theme,
       title: title,
       grid: gridFor(settings),
-      swap: job.swap,
       pages: pages,
     );
   }

@@ -51,7 +51,6 @@ void main() {
       title: 't',
       pages: SheetPages.backs,
       grid: const SheetGrid(backDyMm: 1),
-      swap: true,
     );
     expect(pageCount(backs), 2);
 

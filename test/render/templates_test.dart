@@ -2,6 +2,8 @@ import 'package:flashcards/domain/card_content.dart';
 import 'package:flashcards/render/templates/templates.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'samples.dart';
+
 List<String> texts(CardFace face) => [
   for (final block in face.blocks)
     if (block is TextBlock) block.markup,
@@ -56,10 +58,16 @@ void main() {
     expect(texts(faces.back), ['Ambulo.']);
   });
 
-  test('swap exchanges the sides', () {
-    final faces = facesOf(const BegripContent(term: 't', explanation: 'e'));
-    final swapped = faces.oriented(swap: true);
-    expect(texts(swapped.front), ['e']);
-    expect(texts(swapped.back), ['t']);
+  test('each card type has one fixed front', () {
+    CardFaces facesFor(int sample) => facesOf(sampleContents[sample]);
+    // Vocabulary and sentence: Dutch.
+    expect(texts(facesFor(0).front), ['meisje', 'mv. meisjes']);
+    expect(texts(facesFor(6).front), ['Het meisje houdt van de zeeman.']);
+    // Begrip: the term. Paradigm: the meaning/infinitive.
+    expect(texts(facesFor(4).front), ['Fotosynthese']);
+    expect(texts(facesFor(5).front), ['amare – liefhebben']);
+    // History: the date; the event is on the back.
+    expect(texts(facesFor(7).front), ['1568–1648']);
+    expect(texts(facesFor(7).back).first, 'Tachtigjarige Oorlog');
   });
 }

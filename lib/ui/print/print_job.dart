@@ -3,38 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/store/library.dart';
 import '../../data/store/library_notifier.dart';
 import '../../data/store/settings.dart';
-import '../../domain/card_content.dart';
 import '../../domain/deck.dart';
 import '../../render/grid.dart';
-import '../../render/overflow.dart';
 import '../../render/sheet.dart';
-import '../providers.dart';
 
 /// What the print set-up page has chosen.
 class PrintJob {
-  const PrintJob({
-    this.deckIds = const {},
-    this.swap = false,
-    this.printAnyway = const {},
-  });
+  const PrintJob({this.deckIds = const {}});
 
   final Set<String> deckIds;
 
-  /// Print each card's back as its front.
-  final bool swap;
-
-  /// Overflowing cards the user chose not to skip.
-  final Set<String> printAnyway;
-
-  PrintJob copyWith({
-    Set<String>? deckIds,
-    bool? swap,
-    Set<String>? printAnyway,
-  }) => PrintJob(
-    deckIds: deckIds ?? this.deckIds,
-    swap: swap ?? this.swap,
-    printAnyway: printAnyway ?? this.printAnyway,
-  );
+  PrintJob copyWith({Set<String>? deckIds}) =>
+      PrintJob(deckIds: deckIds ?? this.deckIds);
 }
 
 class PrintJobNotifier extends Notifier<PrintJob> {
@@ -59,16 +39,6 @@ class PrintJobNotifier extends Notifier<PrintJob> {
       deckIds: ticked
           ? {...state.deckIds, ...deckIds}
           : ({...state.deckIds}..removeAll(deckIds)),
-    );
-  }
-
-  void toggleSwap() => state = state.copyWith(swap: !state.swap);
-
-  void setSkip(String cardId, {required bool skip}) {
-    state = state.copyWith(
-      printAnyway: skip
-          ? ({...state.printAnyway}..remove(cardId))
-          : {...state.printAnyway, cardId},
     );
   }
 
@@ -99,37 +69,10 @@ List<Deck> orderedDecks(Iterable<Deck> decks) => [
     for (final submap in submapsOf(map, decks)) ...decksIn(map, submap, decks),
 ];
 
-/// The cards of the ticked decks in Library order, and which of them
-/// overflow.
-class PrintPlan {
-  const PrintPlan({required this.cards, required this.overflowing});
-
-  /// Every card of the ticked decks, overflowing ones included.
-  final List<PrintCard> cards;
-
-  /// Cards that don't fit, by uuid.
-  final Set<String> overflowing;
-
-  /// The cards that go on paper: overflowing cards are skipped unless the
-  /// user chose to print them anyway.
-  List<PrintCard> printed(PrintJob job) => [
-    for (final c in cards)
-      if (!overflowing.contains(c.card.uuid) ||
-          job.printAnyway.contains(c.card.uuid))
-        c,
-  ];
-
-  /// Target languages of the vocabulary cards, for the direction line.
-  Set<VocabLanguage> get languages => {
-    for (final c in cards)
-      if (c.card.content case VocabularyContent(:final language)) language,
-  };
-}
-
-final printPlanProvider = Provider<PrintPlan>((ref) {
+/// The cards of the ticked decks in Library order.
+final printCardsProvider = Provider<List<PrintCard>>((ref) {
   final job = ref.watch(printJobProvider);
   final library = ref.watch(libraryProvider);
-  final OverflowChecker? checker = ref.watch(overflowCheckerProvider);
   final cards = <PrintCard>[];
   for (final deck in orderedDecks(library.decks.values)) {
     if (!job.deckIds.contains(deck.id)) continue;
@@ -137,13 +80,7 @@ final printPlanProvider = Provider<PrintPlan>((ref) {
       ..sort((a, b) => a.seq.compareTo(b.seq));
     cards.addAll([for (final card in inDeck) PrintCard(card, deck.title)]);
   }
-  return PrintPlan(
-    cards: cards,
-    overflowing: {
-      for (final c in cards)
-        if (checker?.overflows(c.card.content) ?? false) c.card.uuid,
-    },
-  );
+  return cards;
 });
 
 /// The sheet grid with the printer calibration.

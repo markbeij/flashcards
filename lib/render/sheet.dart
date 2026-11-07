@@ -40,13 +40,11 @@ int sheetCount(int cardCount) =>
 /// Builds the print document. Every page has the same grid; backs sit in
 /// the mirrored column (flip on the long edge) and are moved by the
 /// calibration offset. Cut ticks sit in the margins; cards have no borders.
-/// With [swap], each card's back is printed as its front.
 Future<Uint8List> buildSheets(
   List<PrintCard> cards, {
   required pw.ThemeData theme,
   required String title,
   SheetGrid grid = const SheetGrid(),
-  bool swap = false,
   SheetPages pages = SheetPages.duplex,
 }) {
   final doc = pw.Document(theme: theme, title: title);
@@ -63,34 +61,30 @@ Future<Uint8List> buildSheets(
           : start + cardsPerSheet,
     );
     for (final side in sides) {
-      doc.addPage(_page(sheet, side, grid: grid, swap: swap));
+      doc.addPage(_page(sheet, side, grid: grid));
     }
   }
   return doc.save();
 }
 
-pw.Page _page(
-  List<PrintCard> cards,
-  Side side, {
-  required SheetGrid grid,
-  required bool swap,
-}) => pw.Page(
-  pageFormat: _a4,
-  margin: pw.EdgeInsets.zero,
-  build: (context) => pw.Stack(
-    children: [
-      pw.CustomPaint(
-        size: const PdfPoint(pageWidthMm * _mm, pageHeightMm * _mm),
-        painter: (canvas, size) => paintCutTicks(canvas, grid, side),
+pw.Page _page(List<PrintCard> cards, Side side, {required SheetGrid grid}) =>
+    pw.Page(
+      pageFormat: _a4,
+      margin: pw.EdgeInsets.zero,
+      build: (context) => pw.Stack(
+        children: [
+          pw.CustomPaint(
+            size: const PdfPoint(pageWidthMm * _mm, pageHeightMm * _mm),
+            painter: (canvas, size) => paintCutTicks(canvas, grid, side),
+          ),
+          for (final (index, print) in cards.indexed)
+            _placed(grid.cell(index, side), _side(print, side)),
+        ],
       ),
-      for (final (index, print) in cards.indexed)
-        _placed(grid.cell(index, side), _side(print, side, swap)),
-    ],
-  ),
-);
+    );
 
-pw.Widget _side(PrintCard print, Side side, bool swap) {
-  final faces = facesOf(print.card.content).oriented(swap: swap);
+pw.Widget _side(PrintCard print, Side side) {
+  final faces = facesOf(print.card.content);
   return cardSide(
     side == Side.front ? faces.front : faces.back,
     footer: footerText(print.deckTitle, print.card.seq),

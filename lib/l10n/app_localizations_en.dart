@@ -248,6 +248,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overflowLong => 'Doesn\'t fit on the card — shorten it.';
 
   @override
+  String get spaceOnCard => 'Space on the card';
+
+  @override
+  String spaceUsed(int percent) {
+    return '$percent% full';
+  }
+
+  @override
+  String get searchDecks => 'Search decks';
+
+  @override
+  String get searchNoResults => 'No decks found';
+
+  @override
   String get bold => 'Bold';
 
   @override
@@ -414,41 +428,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get printNothing => 'There are no decks yet.';
-
-  @override
-  String get printDoesntFit => 'Doesn\'t fit';
-
-  @override
-  String get printDoesntFitHint =>
-      'These cards are skipped unless you turn off Skip.';
-
-  @override
-  String get fix => 'Fix';
-
-  @override
-  String get skip => 'Skip';
-
-  @override
-  String get printDirection => 'Direction';
-
-  @override
-  String frontShows(String side) {
-    return 'Front shows: $side';
-  }
-
-  @override
-  String backShows(String side) {
-    return 'Back shows: $side';
-  }
-
-  @override
-  String get directionQuestion => 'question';
-
-  @override
-  String get directionAnswer => 'answer';
-
-  @override
-  String get swapSides => 'Swap front and back';
 
   @override
   String get fronts => 'Fronts';

@@ -4,6 +4,49 @@ import 'package:flashcards/domain/flashcard.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('search', () {
+    Deck deck(String map, String submap, String title) => Deck(
+      id: '$map/$submap/$title',
+      map: map,
+      submap: submap,
+      title: title,
+      lastCardType: CardType.vocabulary,
+      lastLanguage: VocabLanguage.latin,
+    );
+    final decks = [
+      deck('VWO 4', 'Latijn', 'Woordjes H3'),
+      deck('VWO 4', 'Frans', 'Woordjes H10'),
+      deck('VWO 5', 'Geschiedenis', 'Café en salon'),
+    ];
+    List<String> titles(String query) => [
+      for (final d in searchDecks(query, decks)) d.title,
+    ];
+
+    test('finds by title, map and submap', () {
+      expect(titles('h3'), ['Woordjes H3']);
+      expect(titles('latijn'), ['Woordjes H3']);
+      expect(titles('vwo 4'), ['Woordjes H10', 'Woordjes H3']);
+    });
+
+    test('ignores case and accents', () {
+      expect(titles('CAFE'), ['Café en salon']);
+      expect(titles('café'), ['Café en salon']);
+      expect(titles('amō'), isEmpty);
+      expect(foldForSearch('Amō'), 'amo');
+    });
+
+    test('a blank query or no match finds nothing', () {
+      expect(titles(''), isEmpty);
+      expect(titles('   '), isEmpty);
+      expect(titles('grieks'), isEmpty);
+    });
+
+    test('results are in Library order', () {
+      expect(titles('woordjes'), ['Woordjes H10', 'Woordjes H3']);
+      expect(titles('o'), ['Woordjes H10', 'Woordjes H3', 'Café en salon']);
+    });
+  });
+
   group('natural sort', () {
     List<String> sorted(List<String> names) => [...names]..sort(compareNatural);
 

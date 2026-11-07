@@ -294,11 +294,32 @@
   },
   "overflowShort": "Past niet",
   "@overflowShort": {
-    "description": "Overflow badge on a card row."
+    "description": "VoiceOver label of the overflow icon in a vocabulary grid row."
   },
   "overflowLong": "Past niet op de kaart — maak het korter.",
+  "spaceOnCard": "Ruimte op de kaart",
+  "@spaceOnCard": {
+    "description": "Label of the bar that shows how full one side of the card is."
+  },
+  "spaceUsed": "{percent}% vol",
+  "@spaceUsed": {
+    "description": "VoiceOver value of that bar.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "searchDecks": "Zoek stapels",
+  "@searchDecks": {
+    "description": "Placeholder of the Library search field."
+  },
+  "searchNoResults": "Geen stapels gevonden",
+  "@searchNoResults": {
+    "description": "Shown when no deck matches the search."
+  },
   "@overflowLong": {
-    "description": "Overflow badge in the entry screens."
+    "description": "Overflow badge under the space bar in the entry screens."
   },
   "bold": "Vet",
   "@bold": {
@@ -529,56 +550,6 @@
   "printNothing": "Er zijn nog geen stapels.",
   "@printNothing": {
     "description": "Print set-up without decks."
-  },
-  "printDoesntFit": "Past niet",
-  "@printDoesntFit": {
-    "description": "Print set-up section: overflowing cards."
-  },
-  "printDoesntFitHint": "Deze kaarten worden overgeslagen, tenzij je Overslaan uitzet.",
-  "@printDoesntFitHint": {
-    "description": "Under the overflowing cards."
-  },
-  "fix": "Aanpassen",
-  "@fix": {
-    "description": "Button: open the card to shorten it."
-  },
-  "skip": "Overslaan",
-  "@skip": {
-    "description": "Switch label: leave the card out."
-  },
-  "printDirection": "Richting",
-  "@printDirection": {
-    "description": "Print set-up section."
-  },
-  "frontShows": "Voorkant: {side}",
-  "@frontShows": {
-    "description": "Direction line.",
-    "placeholders": {
-      "side": {
-        "type": "String"
-      }
-    }
-  },
-  "backShows": "Achterkant: {side}",
-  "@backShows": {
-    "description": "Direction line.",
-    "placeholders": {
-      "side": {
-        "type": "String"
-      }
-    }
-  },
-  "directionQuestion": "vraag",
-  "@directionQuestion": {
-    "description": "Direction for cards without a language: the question side."
-  },
-  "directionAnswer": "antwoord",
-  "@directionAnswer": {
-    "description": "Direction for cards without a language: the answer side."
-  },
-  "swapSides": "Voor- en achterkant wisselen",
-  "@swapSides": {
-    "description": "Button ⇄."
   },
   "fronts": "Voorkanten",
   "@fronts": {

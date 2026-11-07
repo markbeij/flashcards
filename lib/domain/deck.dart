@@ -104,6 +104,54 @@ List<Deck> decksIn(String map, String submap, Iterable<Deck> decks) => [
     if (deck.map == map && deck.submap == submap) deck,
 ]..sort((a, b) => compareNatural(a.title, b.title));
 
+/// The decks whose title, map or submap contains [query], in Library order
+/// (map, submap, title). Case and accents are ignored. A blank query finds
+/// nothing: the caller shows the whole Library instead.
+List<Deck> searchDecks(String query, Iterable<Deck> decks) {
+  final needle = foldForSearch(query.trim());
+  if (needle.isEmpty) return const [];
+  return [
+    for (final deck in decks)
+      if ([
+        deck.title,
+        deck.map,
+        deck.submap,
+      ].any((text) => foldForSearch(text).contains(needle)))
+        deck,
+  ]..sort((a, b) {
+    final byMap = compareNatural(a.map, b.map);
+    if (byMap != 0) return byMap;
+    final bySubmap = compareNatural(a.submap, b.submap);
+    return bySubmap != 0 ? bySubmap : compareNatural(a.title, b.title);
+  });
+}
+
+/// Lower case without accents, so "Cafe" finds "Café" and "amo" finds
+/// "amō". Covers the Latin letters of the school languages.
+String foldForSearch(String text) {
+  final out = StringBuffer();
+  for (final rune in text.toLowerCase().runes) {
+    out.write(_unaccented[rune] ?? String.fromCharCode(rune));
+  }
+  return out.toString();
+}
+
+final _unaccented = <int, String>{
+  for (final MapEntry(:key, :value) in const {
+    'a': 'àáâãäåāăą',
+    'c': 'çćĉċč',
+    'e': 'èéêëēĕėęě',
+    'i': 'ìíîïĩīĭįı',
+    'n': 'ñńņň',
+    'o': 'òóôõöøōŏő',
+    'u': 'ùúûüũūŭůűų',
+    's': 'śŝşš',
+    'y': 'ýÿ',
+    'z': 'źżž',
+  }.entries)
+    for (final rune in value.runes) rune: key,
+};
+
 /// Compares names so that numbers sort by value: "H2" < "H10", "§1" < "§2".
 /// Case is ignored unless it is the only difference.
 int compareNatural(String a, String b) {

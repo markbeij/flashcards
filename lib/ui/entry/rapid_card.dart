@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../render/grid.dart' show Side;
 import '../common/card_summary.dart';
 import 'card_preview.dart';
 import 'draft.dart';
 import 'entry_session.dart';
 import 'entry_widgets.dart';
 import 'field_labels.dart';
+import 'space_bar.dart';
 
 /// Vocabulary entry on a narrow screen: the grid's row engine with one
 /// visible row. Next → Next saves the card and clears the fields.
@@ -38,8 +40,45 @@ class _RapidCardState extends State<RapidCard> {
         final recent = saved.length <= 3
             ? saved
             : saved.sublist(saved.length - 3);
-        final fields = session.gridOrder(row);
+        // The fields of each side together, with that side's space bar.
+        final order = session.gridOrder(row);
+        final front = [
+          for (final f in order)
+            if (f.side == Side.front) f,
+        ];
+        final back = [
+          for (final f in order)
+            if (f.side == Side.back) f,
+        ];
+        final fields = [...front, ...back];
         final extras = vocabularyExtras(row.language);
+
+        List<Widget> group(List<DraftField> group, Side side) => [
+          for (final f in group) ...[
+            Text(
+              fieldLabel(l10n, f, row.language).full,
+              style: TextStyle(color: secondary, fontSize: 13),
+            ),
+            const SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                width: f == DraftField.gender ? 72 : double.infinity,
+                child: EntryTextField(
+                  key: ValueKey((row.key, f)),
+                  controller: row.controller(f),
+                  focusNode: row.focus(f),
+                  semanticLabel: cellSemantics(l10n, row, f),
+                  gender: f == DraftField.gender,
+                  large: true,
+                  onEditingComplete: () => session.next(row, f, order: fields),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          SpaceBar(session: session, draft: row, side: side),
+        ];
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -67,29 +106,8 @@ class _RapidCardState extends State<RapidCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (final f in fields) ...[
-                    Text(
-                      fieldLabel(l10n, f, row.language).full,
-                      style: TextStyle(color: secondary, fontSize: 13),
-                    ),
-                    const SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: SizedBox(
-                        width: f == DraftField.gender ? 72 : double.infinity,
-                        child: EntryTextField(
-                          key: ValueKey((row.key, f)),
-                          controller: row.controller(f),
-                          focusNode: row.focus(f),
-                          semanticLabel: cellSemantics(l10n, row, f),
-                          gender: f == DraftField.gender,
-                          large: true,
-                          onEditingComplete: () => session.next(row, f),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
+                  ...group(front, Side.front),
+                  ...group(back, Side.back),
                 ],
               ),
             ),

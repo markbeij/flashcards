@@ -12,7 +12,6 @@ import '../../l10n/app_localizations.dart';
 import '../../render/card_size.dart';
 import '../../render/sheet.dart';
 import '../common/card_summary.dart';
-import '../common/overflow_badge.dart';
 import '../providers.dart';
 import 'entry_session.dart';
 
@@ -175,9 +174,6 @@ class _CardPreviewState extends ConsumerState<CardPreview> {
     ref.listen(cardThemeProvider, (_, _) => _render());
     final l10n = AppLocalizations.of(context);
     final content = widget.content;
-    final overflow =
-        content != null &&
-        (ref.watch(overflowCheckerProvider)?.overflows(content) ?? false);
     return ExcludeFocus(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -214,7 +210,6 @@ class _CardPreviewState extends ConsumerState<CardPreview> {
                   ),
                   const SizedBox(height: 12),
                 ],
-                if (overflow) const OverflowBadge(long: true),
               ],
             ),
           );

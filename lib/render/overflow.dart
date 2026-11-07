@@ -9,10 +9,38 @@ import 'templates/templates.dart';
 
 const _mm = PdfPageFormat.mm;
 
-/// Finds cards whose content doesn't fit (Spike 2). A card overflows when a
-/// side's content is taller than the content area, or when a single word is
-/// wider than the space it is set in. Overflowing cards are flagged, never
-/// shrunk.
+/// A hair of tolerance for rounding in the layout, in points.
+const _tolerance = 0.01;
+
+/// How full one side of a card is.
+class SideFill {
+  const SideFill({required this.fill, required this.wordTooWide});
+
+  /// Content height ÷ available height. Above 1 the content is too tall.
+  final double fill;
+
+  /// A single word is wider than the space it is set in.
+  final bool wordTooWide;
+
+  /// The side doesn't fit: too tall, or a word is too wide.
+  bool get full =>
+      wordTooWide || fill > 1 + _tolerance / (contentHeightMm * _mm);
+}
+
+/// How full both sides of a card are.
+class CardFill {
+  const CardFill({required this.front, required this.back});
+
+  final SideFill front;
+  final SideFill back;
+
+  /// Either side doesn't fit.
+  bool get full => front.full || back.full;
+}
+
+/// Measures how full each side of a card is (Spike 2). A side is full when
+/// its content is as tall as the content area, or when a single word is
+/// wider than the space it is set in. Text is never shrunk.
 ///
 /// Results are cached by content, so a card is measured again only after it
 /// changes.
@@ -21,22 +49,31 @@ class OverflowChecker {
 
   final pw.ThemeData theme;
   final _document = PdfDocument();
-  final _cache = <CardContent, bool>{};
+  final _cache = <CardContent, CardFill>{};
 
-  bool overflows(CardContent content) => _cache[content] ??= _measure(content);
+  CardFill measure(CardContent content) =>
+      _cache[content] ??= _measure(content);
 
-  bool _measure(CardContent content) {
+  /// Whether either side of the card doesn't fit.
+  bool overflows(CardContent content) => measure(content).full;
+
+  CardFill _measure(CardContent content) {
     final faces = facesOf(content);
-    return _faceOverflows(faces.front) || _faceOverflows(faces.back);
+    return CardFill(front: _side(faces.front), back: _side(faces.back));
   }
 
-  bool _faceOverflows(CardFace face) {
+  SideFill _side(CardFace face) {
     final height = _size(
       faceContent(face),
       pw.BoxConstraints(maxWidth: contentWidthMm * _mm),
     ).y;
-    // A hair of tolerance for rounding in the layout.
-    if (height > contentHeightMm * _mm + 0.01) return true;
+    return SideFill(
+      fill: height / (contentHeightMm * _mm),
+      wordTooWide: _hasTooWideWord(face),
+    );
+  }
+
+  bool _hasTooWideWord(CardFace face) {
     for (final block in face.blocks) {
       final tooWide = switch (block) {
         TextBlock(:final markup, :final role) => _hasWideWord(

@@ -444,17 +444,41 @@ abstract class AppLocalizations {
   /// **'Nederlands'**
   String get languageDutch;
 
-  /// Overflow badge on a card row.
+  /// VoiceOver label of the overflow icon in a vocabulary grid row.
   ///
   /// In nl, this message translates to:
   /// **'Past niet'**
   String get overflowShort;
 
-  /// Overflow badge in the entry screens.
+  /// Overflow badge under the space bar in the entry screens.
   ///
   /// In nl, this message translates to:
   /// **'Past niet op de kaart — maak het korter.'**
   String get overflowLong;
+
+  /// Label of the bar that shows how full one side of the card is.
+  ///
+  /// In nl, this message translates to:
+  /// **'Ruimte op de kaart'**
+  String get spaceOnCard;
+
+  /// VoiceOver value of that bar.
+  ///
+  /// In nl, this message translates to:
+  /// **'{percent}% vol'**
+  String spaceUsed(int percent);
+
+  /// Placeholder of the Library search field.
+  ///
+  /// In nl, this message translates to:
+  /// **'Zoek stapels'**
+  String get searchDecks;
+
+  /// Shown when no deck matches the search.
+  ///
+  /// In nl, this message translates to:
+  /// **'Geen stapels gevonden'**
+  String get searchNoResults;
 
   /// Toolbar button.
   ///
@@ -755,66 +779,6 @@ abstract class AppLocalizations {
   /// In nl, this message translates to:
   /// **'Er zijn nog geen stapels.'**
   String get printNothing;
-
-  /// Print set-up section: overflowing cards.
-  ///
-  /// In nl, this message translates to:
-  /// **'Past niet'**
-  String get printDoesntFit;
-
-  /// Under the overflowing cards.
-  ///
-  /// In nl, this message translates to:
-  /// **'Deze kaarten worden overgeslagen, tenzij je Overslaan uitzet.'**
-  String get printDoesntFitHint;
-
-  /// Button: open the card to shorten it.
-  ///
-  /// In nl, this message translates to:
-  /// **'Aanpassen'**
-  String get fix;
-
-  /// Switch label: leave the card out.
-  ///
-  /// In nl, this message translates to:
-  /// **'Overslaan'**
-  String get skip;
-
-  /// Print set-up section.
-  ///
-  /// In nl, this message translates to:
-  /// **'Richting'**
-  String get printDirection;
-
-  /// Direction line.
-  ///
-  /// In nl, this message translates to:
-  /// **'Voorkant: {side}'**
-  String frontShows(String side);
-
-  /// Direction line.
-  ///
-  /// In nl, this message translates to:
-  /// **'Achterkant: {side}'**
-  String backShows(String side);
-
-  /// Direction for cards without a language: the question side.
-  ///
-  /// In nl, this message translates to:
-  /// **'vraag'**
-  String get directionQuestion;
-
-  /// Direction for cards without a language: the answer side.
-  ///
-  /// In nl, this message translates to:
-  /// **'antwoord'**
-  String get directionAnswer;
-
-  /// Button ⇄.
-  ///
-  /// In nl, this message translates to:
-  /// **'Voor- en achterkant wisselen'**
-  String get swapSides;
 
   /// Preview toggle.
   ///

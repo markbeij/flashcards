@@ -2,11 +2,13 @@ import 'package:flutter/cupertino.dart';
 
 import '../../domain/card_content.dart';
 import '../../l10n/app_localizations.dart';
+import '../../render/grid.dart' show Side;
 import '../common/card_type_labels.dart';
 import 'draft.dart';
 import 'entry_session.dart';
 import 'entry_widgets.dart';
 import 'field_labels.dart';
+import 'space_bar.dart';
 
 /// The stacked form for one card of any type. Used by "Add cards" for
 /// begrip, paradigm, sentence and history, and by the card editor.
@@ -32,6 +34,13 @@ class CardForm extends StatelessWidget {
   };
 
   List<DraftField> get _fields => formFields(draft.type, draft.language);
+
+  /// The field at [index] is the last one on the front.
+  bool _endsFront(int index) {
+    final fields = _fields;
+    return fields[index].side == Side.front &&
+        (index == fields.length - 1 || fields[index + 1].side == Side.back);
+  }
 
   void _next(DraftField field) {
     final fields = _fields;
@@ -90,7 +99,7 @@ class CardForm extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
-            for (final f in _fields) ...[
+            for (final (i, f) in _fields.indexed) ...[
               Text(
                 fieldLabel(l10n, f, draft.language).full,
                 style: TextStyle(color: secondary, fontSize: 13),
@@ -112,6 +121,8 @@ class CardForm extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 14),
+              if (_endsFront(i))
+                SpaceBar(session: session, draft: draft, side: Side.front),
             ],
             if (draft.type == CardType.paradigm) ...[
               Text(
@@ -172,6 +183,7 @@ class CardForm extends StatelessWidget {
                 ),
               ),
             ],
+            SpaceBar(session: session, draft: draft, side: Side.back),
             if (draft.incomplete)
               Text(
                 l10n.cardIncomplete,

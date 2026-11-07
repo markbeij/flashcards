@@ -249,6 +249,20 @@ class AppLocalizationsNl extends AppLocalizations {
   String get overflowLong => 'Past niet op de kaart — maak het korter.';
 
   @override
+  String get spaceOnCard => 'Ruimte op de kaart';
+
+  @override
+  String spaceUsed(int percent) {
+    return '$percent% vol';
+  }
+
+  @override
+  String get searchDecks => 'Zoek stapels';
+
+  @override
+  String get searchNoResults => 'Geen stapels gevonden';
+
+  @override
   String get bold => 'Vet';
 
   @override
@@ -416,41 +430,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get printNothing => 'Er zijn nog geen stapels.';
-
-  @override
-  String get printDoesntFit => 'Past niet';
-
-  @override
-  String get printDoesntFitHint =>
-      'Deze kaarten worden overgeslagen, tenzij je Overslaan uitzet.';
-
-  @override
-  String get fix => 'Aanpassen';
-
-  @override
-  String get skip => 'Overslaan';
-
-  @override
-  String get printDirection => 'Richting';
-
-  @override
-  String frontShows(String side) {
-    return 'Voorkant: $side';
-  }
-
-  @override
-  String backShows(String side) {
-    return 'Achterkant: $side';
-  }
-
-  @override
-  String get directionQuestion => 'vraag';
-
-  @override
-  String get directionAnswer => 'antwoord';
-
-  @override
-  String get swapSides => 'Voor- en achterkant wisselen';
 
   @override
   String get fronts => 'Voorkanten';

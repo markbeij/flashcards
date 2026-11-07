@@ -22,6 +22,19 @@ final overflowCheckerProvider = Provider<OverflowChecker?>((ref) {
 bool overflows(Ref ref, CardContent content) =>
     ref.watch(overflowCheckerProvider)?.overflows(content) ?? false;
 
+/// What is typed in the Library's search field. Lives above the layout
+/// switch, so a resize keeps it.
+class LibrarySearch extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void set(String query) => state = query;
+}
+
+final librarySearchProvider = NotifierProvider<LibrarySearch, String>(
+  LibrarySearch.new,
+);
+
 final decksProvider = Provider<Map<String, Deck>>(
   (ref) => ref.watch(libraryProvider.select((l) => l.decks)),
 );
