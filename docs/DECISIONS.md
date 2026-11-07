@@ -20,7 +20,7 @@ Record decisions and spike results here, newest last. Each entry: date, decision
 
 ## 2026-10-24: Bundle ID `nl.markbeij.flashcards`
 
-- **Status:** the Apple Developer membership has expired and will be renewed later. Until then, real-device testing uses free provisioning (7-day signing), and TestFlight/App Store steps are blocked.
+- **Status (2026-11-07):** the Apple Developer membership is renewed. The app signs with the paid individual team "M Beij" (`WTR35AJS6X`), set locally in `ios/Flutter/Signing.xcconfig` (not committed; see `Signing.xcconfig.example`). Real devices are registered through automatic signing, and TestFlight/App Store steps are unblocked.
 
 ## 2026-10-25: Spikes 3–6 dropped
 
